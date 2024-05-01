@@ -1,8 +1,8 @@
 ITKNornir
 =================================
 
-.. image:: https://github.com/nornir/ITKNornir/actions/workflows/build-test-package.yml/badge.svg
-    :target: https://github.com/nornir/ITKNornir/actions/workflows/build-test-package.yml
+.. image:: https://github.com/thewtex/ITKNornir/actions/workflows/build-test-package.yml/badge.svg
+    :target: https://github.com/thewtex/ITKNornir/actions/workflows/build-test-package.yml
     :alt: Build Status
 
 .. image:: https://img.shields.io/pypi/v/itk-nornir.svg
@@ -10,12 +10,12 @@ ITKNornir
     :alt: PyPI Version
 
 .. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-    :target: https://github.com/nornir/ITKNornir/blob/main/LICENSE
+    :target: https://github.com/thewtex/ITKNornir/blob/main/LICENSE
     :alt: License
 
 Overview
 --------
 
-Nornir’s takes large sets of overlapping images in 2D and produces registered (a.k.a. aligned) 2D and 3D volumes of any size and scale.
+Nornir takes large sets of overlapping images in 2D and produces registered (a.k.a. aligned) 2D and 3D volumes of any size and scale.
 
-Nornir evolved from a collaboration between the Marc Lab and the Scientific Computing Institute’s Tasdizen and Whitaker groups at the University of Utah. The original tools, known as the NCR Toolset were used to construct RC1, a 250um diameter, 33um tall cylinder of rabbit retina at a resoultion of 2.18 nm/pixel. This package provides Pythonic interfaces to the IR tools, https://www.sci.utah.edu/~koshevoy/research/, as a component to the higher level Nornir Python tools.
+Nornir evolved from a collaboration between the Marc Lab and the Scientific Computing Institute’s Tasdizen and Whitaker groups at the University of Utah. The original tools, known as the NCR Toolset were used to construct RC1, a 250um diameter, 33um tall cylinder of rabbit retina at a resolution of 2.18 nm/pixel. This package provides Pythonic interfaces to the IR tools, https://www.sci.utah.edu/~koshevoy/research/, as a component of the higher level Nornir Python tools.
