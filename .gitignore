@@ -1,0 +1,10 @@
+emscripten-build/
+wasi-build/
+node_modules/
+build/
+micromamba/
+test/data.tar.gz
+test/data/
+test/pyodide-emscripten.tar.bz2
+wasm/python/
+wasm/typescript/

@@ -32,4 +32,4 @@ jobs:
 
     - name: Test
       run: |
-        pnpm test
+        pnpm test:python:wasi
