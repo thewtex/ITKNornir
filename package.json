@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "npm scripts to generate itk-wasm artifacts.",
   "private": true,
+  "packageManager": "pnpm@9.1.0",
   "type": "module",
   "itk-wasm": {
     "emscripten-docker-image": "itkwasm/emscripten:20240501-4d931706",
