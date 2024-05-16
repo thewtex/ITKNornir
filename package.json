@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "npm scripts to generate itk-wasm artifacts.",
   "private": true,
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@9.1.1",
   "type": "module",
   "itk-wasm": {
-    "emscripten-docker-image": "itkwasm/emscripten:20240501-4d931706",
-    "wasi-docker-image": "itkwasm/wasi:20240501-4d931706",
+    "emscripten-docker-image": "itkwasm/emscripten:20240517-32a1ffd9",
+    "wasi-docker-image": "itkwasm/wasi:20240517-32a1ffd9",
     "typescript-package-name": "@itk-wasm/nornir",
     "typescript-output-dir": "wasm/typescript",
     "python-package-name": "itkwasm-nornir",
@@ -43,6 +43,6 @@
   "devDependencies": {
     "@itk-wasm/dam": "^1.1.1",
     "@thewtex/setup-micromamba": "^1.9.7",
-    "itk-wasm": "^1.0.0-b.173"
+    "itk-wasm": "^1.0.0-b.174"
   }
 }
