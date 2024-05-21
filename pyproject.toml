@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "itk-nornir"
-version = "0.1.0"
+version = "0.2.0"
 description = "Nornir’s takes large sets of overlapping images in 2D and produces registered (a.k.a. aligned) 2D and 3D volumes of any size and scale."
 readme = "README.rst"
 license = {file = "LICENSE"}
@@ -35,7 +35,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "itk>=5.4rc4",
+    "itk~=5.4.0"
 ]
 
 [project.urls]
