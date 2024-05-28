@@ -28,18 +28,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //                image preprocessing, convenience wrappers for
 //                ITK file and ITK filters.
 
-#ifndef COMMON_HXX_
-#define COMMON_HXX_
+#ifndef itkIRCommon_h
+#define itkIRCommon_h
 
 // local includes:
-#include "utils/the_text.hxx"
-#include "utils/the_utils.hxx"
-#include "itk/itk_terminator.hxx"
-#include "itk/itkNormalizeImageFilterWithMask.h"
-#include "itk/itkLegendrePolynomialTransform.h"
-#include "thread/the_boost_thread.hxx"
-#include "thread/the_transaction.hxx"
-#include "thread/the_thread_pool.hxx"
+#include "itkIRText.h"
+#include "itkIRUtils.h"
+#include "itkIRTerminator.h"
+#include "itkNormalizeImageFilterWithMask.h"
+#include "itkLegendrePolynomialTransform.h"
+#include "IRThread.h"
+#include "IRTransaction.h"
+#include "IRThreadPool.h"
 //#include "utils/AsyncMosaicSave.h"
 
 // system includes:
@@ -99,10 +99,8 @@ using std::flush;
 #include <itkDivideImageFilter.h>
 #include <itkMultiplyImageFilter.h>
 #include <itkRGBPixel.h>
-#include <itkComposeRGBImageFilter.h>
+#include <itkComposeImageFilter.h>
 
-
-#include <omp.h>
 
 #include "IRPath.h"
 
@@ -2190,7 +2188,7 @@ double
 	double final_sb = 0.0; 
 	unsigned long int  final_pixels = 0; 
 
-	#pragma omp parallel for
+	// #pragma omp parallel for
 	for(int iThread = 0; iThread < (int)list_fi_thread_itex.size(); iThread++)
 	{
 		//std::vector<index_t> indexList = threadIndexList[iThread];
@@ -2698,7 +2696,7 @@ void
 	// calculate the bounding boxes:
 	std::vector<the_text_t>	vector_in(in.size()); 
 	vector_in.assign(in.begin(), in.end()); 
-	#pragma omp parallel for
+	// #pragma omp parallel for
 	for (int i = 0; i < (int)vector_in.size(); i++)
 	{
 		the_text_t *iter = &vector_in[i];
@@ -2811,7 +2809,7 @@ bool
 	// calculate the bounding boxes
 	bool ok = true;
 	
-	#pragma omp parallel for
+	// #pragma omp parallel for
 	for (int i = 0; i < (int)num_images; i++)
 	{
 		ok = ok & calc_tile_mosaic_bbox(xform[i],
@@ -4978,7 +4976,7 @@ void
 
 	typedef itk::RGBPixel<native_pixel_t> composite_pixel_t;
 	typedef itk::Image<composite_pixel_t, 2> composite_image_t;
-	typedef itk::ComposeRGBImageFilter<native_image_t, composite_image_t>
+	typedef itk::ComposeImageFilter<native_image_t, composite_image_t>
 		compose_filter_t;
 
 	compose_filter_t::Pointer composer = compose_filter_t::New();
@@ -5278,7 +5276,7 @@ void
 
 	typedef itk::RGBPixel<native_pixel_t> composite_pixel_t;
 	typedef itk::Image<composite_pixel_t, 2> composite_image_t;
-	typedef itk::ComposeRGBImageFilter<IMG, composite_image_t>
+	typedef itk::ComposeImageFilter<IMG, composite_image_t>
 		compose_filter_t;
 
 	typename compose_filter_t::Pointer composer = compose_filter_t::New();
@@ -7119,4 +7117,4 @@ inline static void increment_minor_progress(double amount = 1)
 
 
 
-#endif // COMMON_HXX_
+#endif // itkIRCommon_h

@@ -15,11 +15,15 @@ itk_module(Nornir
   DEPENDS
     ITKCommon
     ITKStatistics
+    ITKIOImageBase
   COMPILE_DEPENDS
     ITKImageSources
+    ITKImageIntensity
+    ITKThresholding
+    ITKSmoothing
+    ITKRegistrationCommon
   TEST_DEPENDS
     ITKTestKernel
-    ITKMetaIO
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
