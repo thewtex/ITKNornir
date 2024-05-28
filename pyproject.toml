@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Education",
     "Intended Audience :: Healthcare Industry",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: Android",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",

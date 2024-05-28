@@ -39,7 +39,7 @@
     "test:wasi": "itk-wasm pnpm-script test:wasi",
     "clean": "git clean -fdx -e node_modules"
   },
-  "license": "Apache-2.0",
+  "license": "GPL-2",
   "devDependencies": {
     "@itk-wasm/dam": "^1.1.1",
     "@thewtex/setup-micromamba": "^1.9.7",

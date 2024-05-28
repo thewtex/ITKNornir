@@ -9,10 +9,6 @@ ITKNornir
     :target: https://pypi.python.org/pypi/itk-nornir
     :alt: PyPI Version
 
-.. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-    :target: https://github.com/thewtex/ITKNornir/blob/main/LICENSE
-    :alt: License
-
 Overview
 --------
 
