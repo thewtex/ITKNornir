@@ -11,6 +11,12 @@ set(Nornir_SRCS
   IRTransaction.cxx
   IRLog.cxx
   IRThreadPool.cxx
-  )
+  IRMosaicRefinementCommon.cxx
+  IRGridCommon.cxx
+  IRFFTCommon.cxx
+  IRGridTransform.cxx
+  itkRegularStepGradientDescentOptimizer2.cxx
+  itkRBFTransform.cxx
+)
 
 itk_module_add_library(Nornir ${Nornir_SRCS})

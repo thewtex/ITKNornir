@@ -30,11 +30,11 @@
 
 // local includes:
 #include "itkIRCommon.h"
-#include "itk/itkLegendrePolynomialTransform.h"
-#include "itk/itkGridTransform.h"
-#include "itk/itkMeshTransform.h"
-#include "itk/itkRBFTransform.h"
-#include "itk/itkRadialDistortionTransform.h"
+#include "itkLegendrePolynomialTransform.h"
+#include "itkGridTransform.h"
+#include "itkMeshTransform.h"
+#include "itkRBFTransform.h"
+#include "itkRadialDistortionTransform.h"
 
 // ITK includes:
 #include <itkTransformFactoryBase.h>
@@ -51,15 +51,16 @@ using std::cerr;
 using std::ios;
 using std::setw;
 
-#if defined (__APPLE__)
-  #include <pthread.h>  // hack necessary to get omp to link even when there aren't any omp pragmas around. Osx-only. See http://stackoverflow.com/questions/8983038/linker-errors-after-enabling-openmp-on-mac.
-  pthread_attr_t gomp_thread_attr;
+#if defined(__APPLE__)
+#  include <pthread.h> // hack necessary to get omp to link even when there aren't any omp pragmas around. Osx-only. See http://stackoverflow.com/questions/8983038/linker-errors-after-enabling-openmp-on-mac.
+pthread_attr_t gomp_thread_attr;
 #endif
 
 //----------------------------------------------------------------
 // BREAK
 //
-int BREAK(unsigned int i)
+int
+BREAK(unsigned int i)
 {
   printf("\n\n\nBREAK BREAK BREAK BREAK BREAK BREAK BREAK: %i\n\n\n\n", i);
   return 0;
@@ -73,47 +74,36 @@ register_transforms()
 {
   // try to avoid re-registering the same transforms over and over again:
   static bool transforms_registered = false;
-  if (transforms_registered) return;
-  
+  if (transforms_registered)
+    return;
+
   // make sure the transforms I care about are known to the object factory:
   itk::TransformFactoryBase::RegisterDefaultTransforms();
-  
-  itk::TransformFactory<itk::IdentityTransform<double, 2> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::TranslationTransform<double, 2> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::FixedCenterOfRotationAffineTransform<double,2> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 1> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 2> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 3> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 4> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 5> >::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::GridTransform>::
-    RegisterTransform();
-  
-  itk::TransformFactory<itk::MeshTransform>::
-    RegisterTransform();
-  
-  itk::TransformFactory< itk::RBFTransform>::
-    RegisterTransform();
-  
-  itk::TransformFactory< itk::RadialDistortionTransform<double, 2> >::
-    RegisterTransform();
-  
+
+  itk::TransformFactory<itk::IdentityTransform<double, 2>>::RegisterTransform();
+
+  itk::TransformFactory<itk::TranslationTransform<double, 2>>::RegisterTransform();
+
+  itk::TransformFactory<itk::FixedCenterOfRotationAffineTransform<double, 2>>::RegisterTransform();
+
+  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 1>>::RegisterTransform();
+
+  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 2>>::RegisterTransform();
+
+  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 3>>::RegisterTransform();
+
+  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 4>>::RegisterTransform();
+
+  itk::TransformFactory<itk::LegendrePolynomialTransform<double, 5>>::RegisterTransform();
+
+  itk::TransformFactory<itk::GridTransform>::RegisterTransform();
+
+  itk::TransformFactory<itk::MeshTransform>::RegisterTransform();
+
+  itk::TransformFactory<itk::RBFTransform>::RegisterTransform();
+
+  itk::TransformFactory<itk::RadialDistortionTransform<double, 2>>::RegisterTransform();
+
   transforms_registered = true;
 }
 
@@ -135,7 +125,7 @@ save_transform(std::ostream & so, const itk::TransformBase * t)
   int prec = so.precision();
 
   // save the variable parameters:
-  params_t vp = t->GetParameters();
+  params_t           vp = t->GetParameters();
   const unsigned int num_vp = vp.size();
   so << " vp " << num_vp;
   for (unsigned int i = 0; i < num_vp; i++)
@@ -165,7 +155,7 @@ save_transform(std::ostream & so, const itk::TransformBase * t)
 // load_transform
 //
 // Load an ITK transform of specified type from a stream.
-// 
+//
 itk::TransformBase::Pointer
 load_transform(std::istream & si, const std::string & transform_type)
 {
@@ -186,28 +176,24 @@ load_transform(std::istream & si, const std::string & transform_type)
   }
 #endif
 
-  itk::LightObject::Pointer tmp =
-    itk::ObjectFactoryBase::CreateInstance(transform_type.c_str());
-  
-  itk::TransformBase::Pointer t =
-    dynamic_cast<itk::TransformBase *>(tmp.GetPointer());
+  itk::LightObject::Pointer tmp = itk::ObjectFactoryBase::CreateInstance(transform_type.c_str());
+
+  itk::TransformBase::Pointer t = dynamic_cast<itk::TransformBase *>(tmp.GetPointer());
 
   if (t.GetPointer() == NULL)
   {
-    cerr << "could not instantiate " << transform_type
-         << ", giving up ..." << endl;
+    cerr << "could not instantiate " << transform_type << ", giving up ..." << endl;
     return t;
   }
   t->Register();
 
   // load the variable parameters:
-  params_t vp;
+  params_t    vp;
   std::string vp_token;
   si >> vp_token;
   if (vp_token != "vp")
   {
-    cerr << "expected vp, received '" << vp_token
-         << "', aborting ..." << endl;
+    cerr << "expected vp, received '" << vp_token << "', aborting ..." << endl;
     assert(false);
   }
 
@@ -224,15 +210,16 @@ load_transform(std::istream & si, const std::string & transform_type)
     // a double:
     long double tmp = 0;
     si >> tmp;
-    if (si.fail()) si.clear();
+    if (si.fail())
+      si.clear();
     vp[i] = double(tmp);
 #else
     si >> vp[i];
 #endif
   }
-  
+
   // load the fixed parameters:
-  params_t fp;
+  params_t    fp;
   std::string fp_token;
   si >> fp_token;
   if (fp_token == "fp")
@@ -240,13 +227,13 @@ load_transform(std::istream & si, const std::string & transform_type)
     fp = t->GetFixedParameters();
     unsigned int num_fp = 0;
     si >> num_fp;
-    
+
     if (num_fp != fp.size())
     {
       // some transforms (RBF) have variable number of fixed parameters:
       fp.SetSize(num_fp);
     }
-    
+
     for (unsigned int i = 0; i < num_fp; i++)
     {
 #ifdef __APPLE__
@@ -256,7 +243,8 @@ load_transform(std::istream & si, const std::string & transform_type)
       // a double:
       long double tmp = 0;
       si >> tmp;
-      if (si.fail()) si.clear();
+      if (si.fail())
+        si.clear();
       fp[i] = double(tmp);
 #else
       si >> fp[i];
@@ -265,11 +253,10 @@ load_transform(std::istream & si, const std::string & transform_type)
   }
   else if (fp_token != "no_fp")
   {
-    cerr << "unexpected token: '" << fp_token
-         << "', aborting ..." << endl;
+    cerr << "unexpected token: '" << fp_token << "', aborting ..." << endl;
     assert(false);
   }
-  
+
   // set the fixed parameters first:
   try
   {
@@ -277,7 +264,7 @@ load_transform(std::istream & si, const std::string & transform_type)
   }
   catch (itk::ExceptionObject &)
   {}
-  
+
   // set the variable parameters:
   t->SetParametersByValue(vp);
 
@@ -286,14 +273,14 @@ load_transform(std::istream & si, const std::string & transform_type)
 
 //----------------------------------------------------------------
 // load_transform
-// 
+//
 itk::TransformBase::Pointer
 load_transform(std::istream & si)
 {
   // load the transform type:
   std::string transform_type;
   si >> transform_type;
-  
+
   return load_transform(si, transform_type);
 }
 
@@ -302,17 +289,17 @@ load_transform(std::istream & si)
 // save_mosaic
 //
 // Save image filenames and associated ITK transforms to a stream.
-// 
+//
 void
-save_mosaic(std::ostream & so,
-            const unsigned int & num_images,
-            const double & pixel_spacing,
-            const bool & use_std_mask,
-            const the_text_t * image,
+save_mosaic(std::ostream &              so,
+            const unsigned int &        num_images,
+            const double &              pixel_spacing,
+            const bool &                use_std_mask,
+            const the_text_t *          image,
             const itk::TransformBase ** transform)
 {
   ios::fmtflags old_flags = so.setf(ios::scientific);
-  int old_precision = so.precision();
+  int           old_precision = so.precision();
   so.precision(12);
 
   so << "format_version_number: " << 1 << endl
@@ -334,23 +321,23 @@ save_mosaic(std::ostream & so,
 
 //----------------------------------------------------------------
 // load_mosaic
-// 
+//
 // Load image filenames and associated ITK transforms from a stream.
-// 
+//
 void
-load_mosaic(std::istream & si,
-            double & pixel_spacing,
-            bool & use_std_mask,
-            std::vector<the_text_t> & image,
+load_mosaic(std::istream &                             si,
+            double &                                   pixel_spacing,
+            bool &                                     use_std_mask,
+            std::vector<the_text_t> &                  image,
             std::vector<itk::TransformBase::Pointer> & transform)
 {
   // make sure the transforms I care about are known to the object factory:
   register_transforms();
-  
+
   unsigned int num_images = ~0;
   unsigned int i = 0;
   unsigned int version = 0;
-  
+
   // for backwards compatibility assume the standard mask is used:
   use_std_mask = true;
 
@@ -388,37 +375,36 @@ load_mosaic(std::istream & si,
         si >> std::ws;
         getline(si, image[i]);
       }
-      
+
       // the next token should be the transform type string:
       std::string next_token;
       si >> next_token;
-      
+
       if (version == 0)
       {
         // Original .mosaic file format kept the filename
         // and the transform type string on the same line,
         // which made filenames with spaces difficult to handle:
-        
+
         while (si.eof() == false)
         {
-          itk::LightObject::Pointer tmp =
-            itk::ObjectFactoryBase::CreateInstance(next_token.c_str());
-          
+          itk::LightObject::Pointer tmp = itk::ObjectFactoryBase::CreateInstance(next_token.c_str());
+
           if (tmp.GetPointer())
           {
             break;
           }
-          
+
           // NOTE: this is a dirty hack to work around filenames with
           // spaces problem in the original file format.
-          
+
           // assume the string that was just read in is a part of filename:
           image[i] += the_text_t(" ");
           image[i] += the_text_t(next_token.c_str());
           si >> next_token;
         }
       }
-      
+
       transform[i] = load_transform(si, next_token);
       i++;
     }
@@ -431,44 +417,39 @@ load_mosaic(std::istream & si,
 
 //----------------------------------------------------------------
 // is_empty_bbox
-// 
+//
 // Test whether a bounding box is empty (min > max)
-// 
+//
 bool
-is_empty_bbox(const pnt2d_t & min,
-              const pnt2d_t & max)
+is_empty_bbox(const pnt2d_t & min, const pnt2d_t & max)
 {
   return min[0] > max[0] || min[1] > max[1];
 }
 
 //----------------------------------------------------------------
 // is_singular_bbox
-// 
+//
 // Test whether a bounding box is singular (min == max)
-// 
+//
 bool
-is_singular_bbox(const pnt2d_t & min,
-                 const pnt2d_t & max)
+is_singular_bbox(const pnt2d_t & min, const pnt2d_t & max)
 {
   return min == max;
 }
 
 //----------------------------------------------------------------
 // clamp_bbox
-// 
+//
 // Restrict a bounding box to be within given limits.
-// 
+//
 void
-clamp_bbox(const pnt2d_t & confines_min,
-           const pnt2d_t & confines_max,
-           pnt2d_t & min,
-           pnt2d_t & max)
+clamp_bbox(const pnt2d_t & confines_min, const pnt2d_t & confines_max, pnt2d_t & min, pnt2d_t & max)
 {
   if (!is_empty_bbox(confines_min, confines_max))
   {
     min[0] = std::min(confines_max[0], std::max(confines_min[0], min[0]));
     min[1] = std::min(confines_max[1], std::max(confines_min[1], min[1]));
-    
+
     max[0] = std::min(confines_max[0], std::max(confines_min[0], max[0]));
     max[1] = std::min(confines_max[1], std::max(confines_min[1], max[1]));
   }
@@ -477,14 +458,14 @@ clamp_bbox(const pnt2d_t & confines_min,
 
 //----------------------------------------------------------------
 // clip_histogram
-// 
+//
 // This is used by CLAHE to limit the contrast ratio slope.
-// 
+//
 void
-clip_histogram(const double & clipping_height,
+clip_histogram(const double &       clipping_height,
                const unsigned int & pdf_size,
                const unsigned int * pdf,
-               double * clipped_pdf)
+               double *             clipped_pdf)
 {
   // count the number of pixels exceeding the clipping height:
   double excess = double(0);
@@ -506,7 +487,8 @@ clip_histogram(const double & clipping_height,
   const double height_increment = excess / deficit;
   for (unsigned int i = 0; i < pdf_size; i++)
   {
-    if (clipped_pdf[i] >= clipping_height) continue;
+    if (clipped_pdf[i] >= clipping_height)
+      continue;
 
     double d = clipping_height - clipped_pdf[i];
     clipped_pdf[i] += d * height_increment;
@@ -515,20 +497,20 @@ clip_histogram(const double & clipping_height,
 
 //----------------------------------------------------------------
 // std_mask
-// 
+//
 // Given image dimensions, generate a mask image.
 // use_std_mask -- the standard mask for the Robert Marc Lab data.
-// 
+//
 mask_t::Pointer
-std_mask(const itk::Point<double, 2> & origin,
+std_mask(const itk::Point<double, 2> &  origin,
          const itk::Vector<double, 2> & spacing,
-         const itk::Size<2> & sz,
-         bool use_std_mask)
+         const itk::Size<2> &           sz,
+         bool                           use_std_mask)
 {
   // setup the mask:
   mask_t::Pointer mask = make_image<mask_t>(spacing, sz, 255);
   mask->SetOrigin(origin);
-  
+
   if (use_std_mask)
   {
     unsigned int roi_x = 0;
@@ -544,7 +526,7 @@ std_mask(const itk::Point<double, 2> & origin,
       fill<mask_t>(mask, roi_x, roi_y, roi_w, roi_h, 0);
     */
   }
-  
+
   return mask;
 }
 
@@ -552,10 +534,8 @@ std_mask(const itk::Point<double, 2> & origin,
 //----------------------------------------------------------------
 // to_wcs
 //
-inline static vec2d_t to_wcs(const vec2d_t & u_axis,
-                             const vec2d_t & v_axis,
-                             const double & u,
-                             const double & v)
+inline static vec2d_t
+to_wcs(const vec2d_t & u_axis, const vec2d_t & v_axis, const double & u, const double & v)
 {
   return u_axis * u + v_axis * v;
 }
@@ -564,11 +544,8 @@ inline static vec2d_t to_wcs(const vec2d_t & u_axis,
 //----------------------------------------------------------------
 // to_wcs
 //
-inline static pnt2d_t to_wcs(const pnt2d_t & origin,
-                             const vec2d_t & u_axis,
-                             const vec2d_t & v_axis,
-                             const double & u,
-                             const double & v)
+inline static pnt2d_t
+to_wcs(const pnt2d_t & origin, const vec2d_t & u_axis, const vec2d_t & v_axis, const double & u, const double & v)
 {
   return origin + to_wcs(u_axis, v_axis, u, v);
 }
@@ -577,7 +554,7 @@ inline static pnt2d_t to_wcs(const pnt2d_t & origin,
 // calc_tile_mosaic_bbox
 //
 bool
-	calc_tile_mosaic_bbox(const base_transform_t * mosaic_to_tile,
+calc_tile_mosaic_bbox(const base_transform_t * mosaic_to_tile,
 
                       // image space bounding boxes of the tile:
                       const pnt2d_t & tile_min,
@@ -595,37 +572,37 @@ bool
   mosaic_min[1] = mosaic_min[0];
   mosaic_max[0] = -mosaic_min[0];
   mosaic_max[1] = -mosaic_min[0];
-  
+
   // it happens:
   if (tile_min[0] == std::numeric_limits<double>::max() || !mosaic_to_tile)
   {
     return true;
   }
-  
+
   base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
   if (tile_to_mosaic.GetPointer() == NULL)
   {
     return false;
   }
-  
+
   double W = tile_max[0] - tile_min[0];
   double H = tile_max[1] - tile_min[1];
 
   // a temporary vector to hold the sample points:
   std::vector<pnt2d_t> xy((np + 1) * 4);
-  
+
   // corner points:
   xy[0] = pnt2d(tile_min[0], tile_min[1]);
   xy[1] = pnt2d(tile_min[0], tile_max[1]);
   xy[2] = pnt2d(tile_max[0], tile_min[1]);
   xy[3] = pnt2d(tile_max[0], tile_max[1]);
-  
+
   // edge points:
   for (unsigned int j = 0; j < np; j++)
   {
     const double t = double(j + 1) / double(np + 1);
-    double x = tile_min[0] + t * W;
-    double y = tile_min[1] + t * H;
+    double       x = tile_min[0] + t * W;
+    double       y = tile_min[1] + t * H;
 
     unsigned int offset = (j + 1) * 4;
     xy[offset + 0] = pnt2d(x, tile_min[1]);
@@ -633,26 +610,20 @@ bool
     xy[offset + 2] = pnt2d(tile_min[0], y);
     xy[offset + 3] = pnt2d(tile_max[0], y);
   }
-  
+
   // find the inverse mapping for each point, if possible:
   std::list<pnt2d_t> uv_list;
   for (unsigned int j = 0; j < xy.size(); j++)
   {
     pnt2d_t uv;
-    if (find_inverse(tile_min,
-                     tile_max,
-                     mosaic_to_tile,
-                     tile_to_mosaic.GetPointer(),
-                     xy[j],
-                     uv))
+    if (find_inverse(tile_min, tile_max, mosaic_to_tile, tile_to_mosaic.GetPointer(), xy[j], uv))
     {
       uv_list.push_back(uv);
     }
   }
-  
+
   // calculate the bounding box of the inverse-mapped points:
-  for (std::list<pnt2d_t>::const_iterator iter = uv_list.begin();
-       iter != uv_list.end(); ++iter)
+  for (std::list<pnt2d_t>::const_iterator iter = uv_list.begin(); iter != uv_list.end(); ++iter)
   {
     const pnt2d_t & uv = *iter;
     mosaic_min[0] = std::min(mosaic_min[0], uv[0]);
@@ -660,7 +631,7 @@ bool
     mosaic_min[1] = std::min(mosaic_min[1], uv[1]);
     mosaic_max[1] = std::max(mosaic_max[1], uv[1]);
   }
-  
+
   return !uv_list.empty();
 }
 
@@ -669,13 +640,13 @@ bool
 // make_colors
 //
 // Generate a scrambled rainbow colormap.
-// 
+//
 void
 make_colors(const unsigned int & num_colors, std::vector<xyz_t> & color)
 {
-  static const xyz_t EAST  = xyz(1, 0, 0);
+  static const xyz_t EAST = xyz(1, 0, 0);
   static const xyz_t NORTH = xyz(0, 1, 0);
-  static const xyz_t WEST  = xyz(0, 0, 1);
+  static const xyz_t WEST = xyz(0, 0, 1);
   static const xyz_t SOUTH = xyz(0, 0, 0);
 
   color.resize(num_colors);
@@ -683,34 +654,32 @@ make_colors(const unsigned int & num_colors, std::vector<xyz_t> & color)
   for (unsigned int i = 0; i < num_colors; i++)
   {
 #if 1
-    double t = fmod(double(i % 2) / 2.0 +
-                    double(i) / double(num_colors - 1), 1.0);
+    double t = fmod(double(i % 2) / 2.0 + double(i) / double(num_colors - 1), 1.0);
 #else
     double t = double(i) / double(num_colors);
 #endif
-    
-    double s = 0.5 + 0.5 * fmod(double((i + 1) % 3) / 3.0 +
-                                double(i) / double(num_colors - 1), 1.0);
+
+    double s = 0.5 + 0.5 * fmod(double((i + 1) % 3) / 3.0 + double(i) / double(num_colors - 1), 1.0);
     color[i] = hsv_to_rgb(xyz(t, s, 1.0)) * 255.0;
   }
 }
 
 //----------------------------------------------------------------
 // find_inverse
-// 
-// Given a forward transform and image space coordinates, 
+//
+// Given a forward transform and image space coordinates,
 // find mosaic space coordinates.
-// 
+//
 bool
-find_inverse(const pnt2d_t & tile_min,        // tile space
-             const pnt2d_t & tile_max,        // tile space
+find_inverse(const pnt2d_t &          tile_min, // tile space
+             const pnt2d_t &          tile_max, // tile space
              const base_transform_t * mosaic_to_tile,
-             const pnt2d_t & xy,        // tile space
-             pnt2d_t & uv,                // mosaic space
-             const unsigned int max_iterations,
-             const double min_step_scale,
-             const double min_error_sqrd,
-             const unsigned int pick_up_pace_steps)
+             const pnt2d_t &          xy, // tile space
+             pnt2d_t &                uv, // mosaic space
+             const unsigned int       max_iterations,
+             const double             min_step_scale,
+             const double             min_error_sqrd,
+             const unsigned int       pick_up_pace_steps)
 {
   base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
   return find_inverse(tile_min,
@@ -726,43 +695,42 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
 
 //----------------------------------------------------------------
 // find_inverse
-// 
+//
 // Given a forward transform, an approximate inverse transform,
 // and image space coordinates, find mosaic space coordinates.
-// 
+//
 bool
-find_inverse(const pnt2d_t & tile_min,        // tile space
-             const pnt2d_t & tile_max,        // tile space
+find_inverse(const pnt2d_t &          tile_min, // tile space
+             const pnt2d_t &          tile_max, // tile space
              const base_transform_t * mosaic_to_tile,
              const base_transform_t * tile_to_mosaic,
-             const pnt2d_t & xy,        // tile space
-             pnt2d_t & uv,                // mosaic space
-             const unsigned int max_iterations,
-             const double min_step_scale,
-             const double min_error_sqrd,
-             const unsigned int pick_up_pace_steps)
+             const pnt2d_t &          xy, // tile space
+             pnt2d_t &                uv, // mosaic space
+             const unsigned int       max_iterations,
+             const double             min_step_scale,
+             const double             min_error_sqrd,
+             const unsigned int       pick_up_pace_steps)
 {
   // #define DEBUG_FIND_INVERSE
   if (tile_to_mosaic == NULL)
   {
     return false;
   }
-  
-  const itk::GridTransform *gridTransform = 
-    dynamic_cast<const itk::GridTransform *>(tile_to_mosaic);
+
+  const itk::GridTransform * gridTransform = dynamic_cast<const itk::GridTransform *>(tile_to_mosaic);
   if (gridTransform != NULL)
   {
     // special case for the grid transform -- the inverse is either exact
     // or it doesn't exist (maps to extreme coordinates):
     pnt2d_t xy_plus;
-    
+
     // Convert image space to mosaic space.
     xy_plus[0] = xy[0] + gridTransform->transform_.tile_min_[0];
     xy_plus[1] = xy[1] + gridTransform->transform_.tile_min_[1];
     uv = tile_to_mosaic->TransformPoint(xy_plus);
     return uv[0] != std::numeric_limits<double>::max();
   }
-  
+
   // the local coordinate system, at the center of the tile:
   pnt2d_t p00 = tile_min + (tile_max - tile_min) * 0.5;
   pnt2d_t p10 = p00;
@@ -788,47 +756,42 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
 #ifdef DEBUG_FIND_INVERSE
   cerr << endl
        << "x_axis: " << x_axis << endl
-       << "u_axis: " << u_axis << endl << endl
+       << "u_axis: " << u_axis << endl
+       << endl
        << "y_axis: " << y_axis << endl
-       << "v_axis: " << v_axis << endl << endl
+       << "v_axis: " << v_axis << endl
+       << endl
        << "p00: " << p00 << endl
-       << "q00: " << q00 << endl << endl;
-#endif
-  
-  // initial guess:
-  uv = to_wcs(q00,
-              u_axis,
-              v_axis,
-              (xy[0] - p00[0]) / x_unit,
-              (xy[1] - p00[1]) / y_unit);
-  
-  // estimate the error:
-  const pnt2d_t & p0 = xy;
-  const pnt2d_t p1 = mosaic_to_tile->TransformPoint(uv);
-  vec2d_t er = p1 - p0;
-  
-#ifdef DEBUG_FIND_INVERSE
-  cerr << "initial error: " << er.GetSquaredNorm()
-       << ", dx: " << er[0] << ", dy: " << er[1]
+       << "q00: " << q00 << endl
        << endl;
 #endif
-  
+
+  // initial guess:
+  uv = to_wcs(q00, u_axis, v_axis, (xy[0] - p00[0]) / x_unit, (xy[1] - p00[1]) / y_unit);
+
+  // estimate the error:
+  const pnt2d_t & p0 = xy;
+  const pnt2d_t   p1 = mosaic_to_tile->TransformPoint(uv);
+  vec2d_t         er = p1 - p0;
+
+#ifdef DEBUG_FIND_INVERSE
+  cerr << "initial error: " << er.GetSquaredNorm() << ", dx: " << er[0] << ", dy: " << er[1] << endl;
+#endif
+
   const double max_step_scale = 1.0;
-  double step_scale = max_step_scale;
+  double       step_scale = max_step_scale;
   unsigned int iteration = 0;
   unsigned int successful_steps = 0;
-  
+
   double e0_sqrd = er.GetSquaredNorm();
-  
+
   // don't try to improve samples with poor initialization (map to NaN):
-  if (e0_sqrd != e0_sqrd) return false;
-  
+  if (e0_sqrd != e0_sqrd)
+    return false;
+
   while (true)
   {
-    const vec2d_t uv_correction = to_wcs(u_axis,
-                                         v_axis,
-                                         -er[0] / x_unit,
-                                         -er[1] / y_unit);
+    const vec2d_t uv_correction = to_wcs(u_axis, v_axis, -er[0] / x_unit, -er[1] / y_unit);
 
     pnt2d_t q = uv;
     q[0] += step_scale * uv_correction[0];
@@ -836,11 +799,10 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
 
     pnt2d_t p = mosaic_to_tile->TransformPoint(q);
     vec2d_t e = p - p0;
-    double e1_sqrd = e.GetSquaredNorm();
+    double  e1_sqrd = e.GetSquaredNorm();
 
 #ifdef DEBUG_FIND_INVERSE
-    cerr << setw(2) << iteration << ": "
-         << e0_sqrd << " vs " << e1_sqrd << " -- ";
+    cerr << setw(2) << iteration << ": " << e0_sqrd << " vs " << e1_sqrd << " -- ";
 #endif
     if (e1_sqrd < e0_sqrd)
     {
@@ -857,9 +819,7 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
         step_scale = std::min(max_step_scale, step_scale * 2.0);
 
 #ifdef DEBUG_FIND_INVERSE
-        cerr << successful_steps
-             << " successful steps -- increasing pace, new step length: "
-             << step_scale << endl;
+        cerr << successful_steps << " successful steps -- increasing pace, new step length: " << step_scale << endl;
 #endif
       }
     }
@@ -868,15 +828,17 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
       step_scale /= 2.0;
       successful_steps = 0;
 #ifdef DEBUG_FIND_INVERSE
-      cerr << "relaxing and backtracking, new step length: "
-           << step_scale << endl;
+      cerr << "relaxing and backtracking, new step length: " << step_scale << endl;
 #endif
     }
 
     iteration++;
-    if (iteration >= max_iterations) break;
-    if (e0_sqrd < min_error_sqrd) break;
-    if (step_scale < min_step_scale) break;
+    if (iteration >= max_iterations)
+      break;
+    if (e0_sqrd < min_error_sqrd)
+      break;
+    if (step_scale < min_step_scale)
+      break;
   }
 #ifdef DEBUG_FIND_INVERSE
   cerr << endl;
@@ -887,74 +849,73 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
 
 //----------------------------------------------------------------
 // find_inverse
-// 
+//
 // Given a forward transform, an approximate inverse transform,
 // and image space coordinates, find mosaic space coordinates.
-// 
+//
 bool
 find_inverse(const base_transform_t * mosaic_to_tile,
              const base_transform_t * tile_to_mosaic,
-             const pnt2d_t & xy,        // tile space
-             pnt2d_t & uv,                // mosaic space
-             const unsigned int max_iterations,
-             const double min_step_scale,
-             const double min_error_sqrd,
-             const unsigned int pick_up_pace_steps)
+             const pnt2d_t &          xy, // tile space
+             pnt2d_t &                uv, // mosaic space
+             const unsigned int       max_iterations,
+             const double             min_step_scale,
+             const double             min_error_sqrd,
+             const unsigned int       pick_up_pace_steps)
 {
   // #define DEBUG_FIND_INVERSE
   if (tile_to_mosaic == NULL)
   {
     return false;
   }
-  
-  if (dynamic_cast<const itk::GridTransform *>(tile_to_mosaic) != NULL || dynamic_cast<const itk::MeshTransform *>(tile_to_mosaic) != NULL)
+
+  if (dynamic_cast<const itk::GridTransform *>(tile_to_mosaic) != NULL ||
+      dynamic_cast<const itk::MeshTransform *>(tile_to_mosaic) != NULL)
   {
     // special case for the grid transform -- the inverse is either exact
     // or it doesn't exist (maps to extreme coordinates):
     uv = tile_to_mosaic->TransformPoint(xy);
     return uv[0] != std::numeric_limits<double>::max();
   }
-  
+
   // initial guess:
   uv = tile_to_mosaic->TransformPoint(xy);
-  
+
   // calculate initial error:
   const pnt2d_t & p0 = xy;
-  pnt2d_t p1 = mosaic_to_tile->TransformPoint(uv);
-  vec2d_t er = p1 - p0;
-  
+  pnt2d_t         p1 = mosaic_to_tile->TransformPoint(uv);
+  vec2d_t         er = p1 - p0;
+
 #ifdef DEBUG_FIND_INVERSE
-  cerr << "initial error: " << er.GetSquaredNorm()
-       << ", dx: " << er[0] << ", dy: " << er[1]
-       << endl;
+  cerr << "initial error: " << er.GetSquaredNorm() << ", dx: " << er[0] << ", dy: " << er[1] << endl;
 #endif
-  
+
   const double max_step_scale = 1.0;
-  double step_scale = max_step_scale;
+  double       step_scale = max_step_scale;
   unsigned int iteration = 0;
   unsigned int successful_steps = 0;
-  
+
   double e0_sqrd = er.GetSquaredNorm();
-  
+
   // don't try to improve samples with poor initialization (map to NaN):
-  if (e0_sqrd != e0_sqrd) return false;
-  
+  if (e0_sqrd != e0_sqrd)
+    return false;
+
   while (true)
   {
-    pnt2d_t uv1 = tile_to_mosaic->TransformPoint(xy - er);
+    pnt2d_t       uv1 = tile_to_mosaic->TransformPoint(xy - er);
     const vec2d_t uv_correction = uv - uv1;
-    
+
     pnt2d_t q = uv;
     q[0] += step_scale * uv_correction[0];
     q[1] += step_scale * uv_correction[1];
-    
+
     pnt2d_t p = mosaic_to_tile->TransformPoint(q);
     vec2d_t e = p - p0;
-    double e1_sqrd = e.GetSquaredNorm();
-    
+    double  e1_sqrd = e.GetSquaredNorm();
+
 #ifdef DEBUG_FIND_INVERSE
-    cerr << setw(2) << iteration << ": "
-         << e0_sqrd << " vs " << e1_sqrd << " -- ";
+    cerr << setw(2) << iteration << ": " << e0_sqrd << " vs " << e1_sqrd << " -- ";
 #endif
     if (e1_sqrd < e0_sqrd)
     {
@@ -965,15 +926,13 @@ find_inverse(const base_transform_t * mosaic_to_tile,
       er = e;
       e0_sqrd = e1_sqrd;
       successful_steps++;
-      
+
       if (successful_steps % pick_up_pace_steps == 0)
       {
         step_scale = std::min(max_step_scale, step_scale * 2.0);
-        
+
 #ifdef DEBUG_FIND_INVERSE
-        cerr << successful_steps
-             << " successful steps -- increasing pace, new step length: "
-             << step_scale << endl;
+        cerr << successful_steps << " successful steps -- increasing pace, new step length: " << step_scale << endl;
 #endif
       }
     }
@@ -982,40 +941,42 @@ find_inverse(const base_transform_t * mosaic_to_tile,
       step_scale /= 2.0;
       successful_steps = 0;
 #ifdef DEBUG_FIND_INVERSE
-      cerr << "relaxing and backtracking, new step length: "
-           << step_scale << endl;
+      cerr << "relaxing and backtracking, new step length: " << step_scale << endl;
 #endif
     }
-    
+
     iteration++;
-    if (iteration >= max_iterations) break;
-    if (e0_sqrd < min_error_sqrd) break;
-    if (step_scale < min_step_scale) break;
+    if (iteration >= max_iterations)
+      break;
+    if (e0_sqrd < min_error_sqrd)
+      break;
+    if (step_scale < min_step_scale)
+      break;
   }
 #ifdef DEBUG_FIND_INVERSE
   cerr << endl;
 #endif
-  
+
   return true;
 }
 
 //----------------------------------------------------------------
 // generate_landmarks_v1
-// 
+//
 // Given a forward transform, generate a set of image space
 // coordinates and find their matching mosaic space coordinates.
-// 
+//
 // version 1 -- uniform jittered sampling over the tile
-// 
+//
 bool
-generate_landmarks_v1(const pnt2d_t & tile_min,
-                      const pnt2d_t & tile_max,
-                      const mask_t * tile_mask,
+generate_landmarks_v1(const pnt2d_t &          tile_min,
+                      const pnt2d_t &          tile_max,
+                      const mask_t *           tile_mask,
                       const base_transform_t * mosaic_to_tile,
-                      const unsigned int samples,
-                      std::vector<pnt2d_t> & xy,
-                      std::vector<pnt2d_t> & uv,
-                      bool refine)
+                      const unsigned int       samples,
+                      std::vector<pnt2d_t> &   xy,
+                      std::vector<pnt2d_t> &   uv,
+                      bool                     refine)
 {
   // #define DEBUG_LANDMARKS
 
@@ -1052,11 +1013,14 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
 #ifdef DEBUG_LANDMARKS
   cerr << endl
        << "x_axis: " << x_axis << endl
-       << "u_axis: " << u_axis << endl << endl
+       << "u_axis: " << u_axis << endl
+       << endl
        << "y_axis: " << y_axis << endl
-       << "v_axis: " << v_axis << endl << endl
+       << "v_axis: " << v_axis << endl
+       << endl
        << "p00: " << p00 << endl
-       << "q00: " << q00 << endl << endl;
+       << "q00: " << q00 << endl
+       << endl;
 #endif
 
   std::list<pnt2d_t> xy_list;
@@ -1071,27 +1035,23 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
       const double s = (double(i) + drand()) / double(samples);
       const double t = (double(j) + drand()) / double(samples);
 
-      double x = tile_min[0] + s * W;
-      double y = tile_min[1] + t * H;
+      double  x = tile_min[0] + s * W;
+      double  y = tile_min[1] + t * H;
       pnt2d_t pt_xy = pnt2d(x, y);
 
       // check to make sure this point is actually inside the tile/mask:
-      if (!pixel_in_mask<mask_t>(tile_mask, pt_xy)) continue;
+      if (!pixel_in_mask<mask_t>(tile_mask, pt_xy))
+        continue;
 
       // map (approximately) into the mosaic space:
-      pnt2d_t pt_uv = to_wcs(q00,
-                             u_axis,
-                             v_axis,
-                             (pt_xy[0] - p00[0]) / x_unit,
-                             (pt_xy[1] - p00[1]) / y_unit);
+      pnt2d_t pt_uv = to_wcs(q00, u_axis, v_axis, (pt_xy[0] - p00[0]) / x_unit, (pt_xy[1] - p00[1]) / y_unit);
 
       // estimate the error:
       const pnt2d_t & p0 = pt_xy;
       const pnt2d_t   p1 = mosaic_to_tile->TransformPoint(pt_uv);
-      vec2d_t pt_er = p1 - p0;
+      vec2d_t         pt_er = p1 - p0;
 #ifdef DEBUG_LANDMARKS
-      cerr << "initial error: " << pt_er.GetSquaredNorm()
-           << ", dx: " << p1[0] - p0[0] << ", dy: " << p1[1] - p0[1]
+      cerr << "initial error: " << pt_er.GetSquaredNorm() << ", dx: " << p1[0] - p0[0] << ", dy: " << p1[1] - p0[1]
            << endl;
 #endif
 
@@ -1111,27 +1071,25 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
     for (unsigned int j = 0; j < xy.size(); j++)
     {
       const unsigned int max_iterations = 100;
-      const double min_step_scale = 1e-12;
-      const double min_error_sqrd = 1e-16;
+      const double       min_step_scale = 1e-12;
+      const double       min_error_sqrd = 1e-16;
       const unsigned int pick_up_pace_steps = 5;
-      const double max_step_scale = 1.0;
+      const double       max_step_scale = 1.0;
 
-      double step_scale = max_step_scale;
+      double       step_scale = max_step_scale;
       unsigned int iteration = 0;
       unsigned int successful_steps = 0;
 
       const pnt2d_t & p0 = xy[j];
-      double e0_sqrd = er[j].GetSquaredNorm();
+      double          e0_sqrd = er[j].GetSquaredNorm();
 
       // don't try to improve samples that fail:
-      if (e0_sqrd != e0_sqrd) continue;
+      if (e0_sqrd != e0_sqrd)
+        continue;
 
       while (true)
       {
-        const vec2d_t uv_correction = to_wcs(u_axis,
-                                             v_axis,
-                                             -er[j][0] / x_unit,
-                                             -er[j][1] / y_unit);
+        const vec2d_t uv_correction = to_wcs(u_axis, v_axis, -er[j][0] / x_unit, -er[j][1] / y_unit);
 
         pnt2d_t q = uv[j];
         q[0] += step_scale * uv_correction[0];
@@ -1139,11 +1097,10 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
 
         pnt2d_t p = mosaic_to_tile->TransformPoint(q);
         vec2d_t e = p - p0;
-        double e1_sqrd = e.GetSquaredNorm();
+        double  e1_sqrd = e.GetSquaredNorm();
 
 #ifdef DEBUG_LANDMARKS
-        cerr << setw(3) << j << " " << setw(2) << iteration << ": "
-             << e0_sqrd << " vs " << e1_sqrd << " -- ";
+        cerr << setw(3) << j << " " << setw(2) << iteration << ": " << e0_sqrd << " vs " << e1_sqrd << " -- ";
 #endif
         if (e1_sqrd < e0_sqrd)
         {
@@ -1160,9 +1117,7 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
             step_scale = std::min(max_step_scale, step_scale * 2.0);
 
 #ifdef DEBUG_LANDMARKS
-            cerr << successful_steps
-                 << " successful steps -- increasing pace, new step length: "
-                 << step_scale << endl;
+            cerr << successful_steps << " successful steps -- increasing pace, new step length: " << step_scale << endl;
 #endif
           }
         }
@@ -1171,15 +1126,17 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
           step_scale /= 2.0;
           successful_steps = 0;
 #ifdef DEBUG_LANDMARKS
-          cerr << "relaxing and backtracking, new step length: "
-               << step_scale << endl;
+          cerr << "relaxing and backtracking, new step length: " << step_scale << endl;
 #endif
         }
 
         iteration++;
-        if (iteration >= max_iterations) break;
-        if (e0_sqrd < min_error_sqrd) break;
-        if (step_scale < min_step_scale) break;
+        if (iteration >= max_iterations)
+          break;
+        if (e0_sqrd < min_error_sqrd)
+          break;
+        if (step_scale < min_step_scale)
+          break;
       }
 #ifdef DEBUG_LANDMARKS
       cerr << endl;
@@ -1192,7 +1149,8 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
   uv_list.clear();
   for (unsigned int j = 0; j < er.size(); j++)
   {
-    if (er[j] != er[j]) continue;
+    if (er[j] != er[j])
+      continue;
 
     xy_list.push_back(xy[j]);
     uv_list.push_back(uv[j]);
@@ -1207,23 +1165,23 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
 
 //----------------------------------------------------------------
 // generate_landmarks_v2
-// 
+//
 // Given a forward transform, generate a set of image space
 // coordinates and find their matching mosaic space coordinates.
-// 
+//
 // version 2 -- non-uniform sampling skewed towards the center
 //              of the tile radially. This may be useful when
 //              the transform is ill-behaved at the tile edges.
-// 
+//
 bool
-generate_landmarks_v2(const pnt2d_t & tile_min,
-                      const pnt2d_t & tile_max,
-                      const mask_t * tile_mask,
+generate_landmarks_v2(const pnt2d_t &          tile_min,
+                      const pnt2d_t &          tile_max,
+                      const mask_t *           tile_mask,
                       const base_transform_t * mosaic_to_tile,
-                      const unsigned int samples,
-                      std::vector<pnt2d_t> & xy,
-                      std::vector<pnt2d_t> & uv,
-                      bool refine)
+                      const unsigned int       samples,
+                      std::vector<pnt2d_t> &   xy,
+                      std::vector<pnt2d_t> &   uv,
+                      bool                     refine)
 {
   // #define DEBUG_LANDMARKS
 
@@ -1260,11 +1218,14 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
 #ifdef DEBUG_LANDMARKS
   cerr << endl
        << "x_axis: " << x_axis << endl
-       << "u_axis: " << u_axis << endl << endl
+       << "u_axis: " << u_axis << endl
+       << endl
        << "y_axis: " << y_axis << endl
-       << "v_axis: " << v_axis << endl << endl
+       << "v_axis: " << v_axis << endl
+       << endl
        << "p00: " << p00 << endl
-       << "q00: " << q00 << endl << endl;
+       << "q00: " << q00 << endl
+       << endl;
 #endif
 
   std::list<pnt2d_t> xy_list;
@@ -1289,24 +1250,20 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
       pnt2d_t pt_xy = pnt2d(x, y);
 
       // check to make sure this point is actually inside the tile/mask:
-      if (!pixel_in_mask<mask_t>(tile_mask, pt_xy)) continue;
+      if (!pixel_in_mask<mask_t>(tile_mask, pt_xy))
+        continue;
 
       // map (approximately) into the mosaic space:
-      pnt2d_t pt_uv = to_wcs(q00,
-                             u_axis,
-                             v_axis,
-                             (pt_xy[0] - p00[0]) / x_unit,
-                             (pt_xy[1] - p00[1]) / y_unit);
+      pnt2d_t pt_uv = to_wcs(q00, u_axis, v_axis, (pt_xy[0] - p00[0]) / x_unit, (pt_xy[1] - p00[1]) / y_unit);
 
       if (refine)
       {
         // estimate the error:
         const pnt2d_t & p0 = pt_xy;
         const pnt2d_t   p1 = mosaic_to_tile->TransformPoint(pt_uv);
-        vec2d_t pt_er = p1 - p0;
+        vec2d_t         pt_er = p1 - p0;
 #ifdef DEBUG_LANDMARKS
-        cerr << "initial error: " << pt_er.GetSquaredNorm()
-             << ", dx: " << p1[0] - p0[0] << ", dy: " << p1[1] - p0[1]
+        cerr << "initial error: " << pt_er.GetSquaredNorm() << ", dx: " << p1[0] - p0[0] << ", dy: " << p1[1] - p0[1]
              << endl;
 #endif
 
@@ -1334,24 +1291,21 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
     for (unsigned int j = 0; j < xy.size(); j++)
     {
       const unsigned int max_iterations = 100;
-      const double min_step_scale = 1e-12;
-      const double min_error_sqrd = 1e-16;
+      const double       min_step_scale = 1e-12;
+      const double       min_error_sqrd = 1e-16;
       const unsigned int pick_up_pace_steps = 5;
-      const double max_step_scale = 1.0;
+      const double       max_step_scale = 1.0;
 
-      double step_scale = max_step_scale;
+      double       step_scale = max_step_scale;
       unsigned int iteration = 0;
       unsigned int successful_steps = 0;
 
       const pnt2d_t & p0 = xy[j];
-      double e0_sqrd = er[j].GetSquaredNorm();
+      double          e0_sqrd = er[j].GetSquaredNorm();
 
       while (true)
       {
-        const vec2d_t uv_correction = to_wcs(u_axis,
-                                             v_axis,
-                                             -er[j][0] / x_unit,
-                                             -er[j][1] / y_unit);
+        const vec2d_t uv_correction = to_wcs(u_axis, v_axis, -er[j][0] / x_unit, -er[j][1] / y_unit);
 
         pnt2d_t q = uv[j];
         q[0] += step_scale * uv_correction[0];
@@ -1359,11 +1313,10 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
 
         pnt2d_t p = mosaic_to_tile->TransformPoint(q);
         vec2d_t e = p - p0;
-        double e1_sqrd = e.GetSquaredNorm();
+        double  e1_sqrd = e.GetSquaredNorm();
 
 #ifdef DEBUG_LANDMARKS
-        cerr << setw(3) << j << " " << setw(2) << iteration << ": "
-             << e0_sqrd << " vs " << e1_sqrd << " -- ";
+        cerr << setw(3) << j << " " << setw(2) << iteration << ": " << e0_sqrd << " vs " << e1_sqrd << " -- ";
 #endif
         if (e1_sqrd < e0_sqrd)
         {
@@ -1380,9 +1333,7 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
             step_scale = std::min(max_step_scale, step_scale * 2.0);
 
 #ifdef DEBUG_LANDMARKS
-            cerr << successful_steps
-                 << " successful steps -- increasing pace, new step length: "
-                 << step_scale << endl;
+            cerr << successful_steps << " successful steps -- increasing pace, new step length: " << step_scale << endl;
 #endif
           }
         }
@@ -1391,15 +1342,17 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
           step_scale /= 2.0;
           successful_steps = 0;
 #ifdef DEBUG_LANDMARKS
-          cerr << "relaxing and backtracking, new step length: "
-               << step_scale << endl;
+          cerr << "relaxing and backtracking, new step length: " << step_scale << endl;
 #endif
         }
 
         iteration++;
-        if (iteration >= max_iterations) break;
-        if (e0_sqrd < min_error_sqrd) break;
-        if (step_scale < min_step_scale) break;
+        if (iteration >= max_iterations)
+          break;
+        if (e0_sqrd < min_error_sqrd)
+          break;
+        if (step_scale < min_step_scale)
+          break;
       }
 #ifdef DEBUG_LANDMARKS
       cerr << endl;
@@ -1412,7 +1365,7 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
 
 //----------------------------------------------------------------
 // generate_landmarks
-// 
+//
 // Given a forward transform, generate a set of image space
 // coordinates and find their matching mosaic space coordinates.
 //
@@ -1420,39 +1373,25 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
 // version 2 -- non-uniform sampling skewed towards the center
 //              of the tile radially. This may be useful when
 //              the transform is ill-behaved at the tile edges.
-// 
+//
 bool
-generate_landmarks(const pnt2d_t & tile_min,
-                   const pnt2d_t & tile_max,
-                   const mask_t * tile_mask,
+generate_landmarks(const pnt2d_t &          tile_min,
+                   const pnt2d_t &          tile_max,
+                   const mask_t *           tile_mask,
                    const base_transform_t * mosaic_to_tile,
-                   const unsigned int samples,
-                   std::vector<pnt2d_t> & xy,
-                   std::vector<pnt2d_t> & uv,
-                   const unsigned int version,
-                   const bool refine)
+                   const unsigned int       samples,
+                   std::vector<pnt2d_t> &   xy,
+                   std::vector<pnt2d_t> &   uv,
+                   const unsigned int       version,
+                   const bool               refine)
 {
   switch (version)
   {
     case 1:
-      return generate_landmarks_v1(tile_min,
-                                   tile_max,
-                                   tile_mask,
-                                   mosaic_to_tile,
-                                   samples,
-                                   xy,
-                                   uv,
-                                   refine);
+      return generate_landmarks_v1(tile_min, tile_max, tile_mask, mosaic_to_tile, samples, xy, uv, refine);
 
     case 2:
-      return generate_landmarks_v2(tile_min,
-                                   tile_max,
-                                   tile_mask,
-                                   mosaic_to_tile,
-                                   samples,
-                                   xy,
-                                   uv,
-                                   refine);
+      return generate_landmarks_v2(tile_min, tile_max, tile_mask, mosaic_to_tile, samples, xy, uv, refine);
   }
 
   return false;
@@ -1460,7 +1399,7 @@ generate_landmarks(const pnt2d_t & tile_min,
 
 //----------------------------------------------------------------
 // generate_landmarks
-// 
+//
 // Given a forward transform, generate a set of image space
 // coordinates and find their matching mosaic space coordinates.
 //
@@ -1468,44 +1407,29 @@ generate_landmarks(const pnt2d_t & tile_min,
 // version 2 -- non-uniform sampling skewed towards the center
 //              of the tile radially. This may be useful when
 //              the transform is ill-behaved at the tile edges.
-// 
+//
 bool
-generate_landmarks(const image_t * tile,
-                   const mask_t * mask,
+generate_landmarks(const image_t *          tile,
+                   const mask_t *           mask,
                    const base_transform_t * mosaic_to_tile,
-                   const unsigned int samples,
-                   std::vector<pnt2d_t> & xy,
-                   std::vector<pnt2d_t> & uv,
-                   const unsigned int version,
-                   const bool refine)
+                   const unsigned int       samples,
+                   std::vector<pnt2d_t> &   xy,
+                   std::vector<pnt2d_t> &   uv,
+                   const unsigned int       version,
+                   const bool               refine)
 {
   image_t::SpacingType sp = tile->GetSpacing();
-  image_t::SizeType sz = tile->GetLargestPossibleRegion().GetSize();
-  const pnt2d_t min = tile->GetOrigin();
-  const pnt2d_t max = min + vec2d(sp[0] * double(sz[0]),
-                                  sp[1] * double(sz[1]));
+  image_t::SizeType    sz = tile->GetLargestPossibleRegion().GetSize();
+  const pnt2d_t        min = tile->GetOrigin();
+  const pnt2d_t        max = min + vec2d(sp[0] * double(sz[0]), sp[1] * double(sz[1]));
 
   switch (version)
   {
     case 1:
-      return generate_landmarks_v1(min,
-                                   max,
-                                   mask,
-                                   mosaic_to_tile,
-                                   samples,
-                                   xy,
-                                   uv,
-                                   refine);
+      return generate_landmarks_v1(min, max, mask, mosaic_to_tile, samples, xy, uv, refine);
 
     case 2:
-      return generate_landmarks_v2(min,
-                                   max,
-                                   mask,
-                                   mosaic_to_tile,
-                                   samples,
-                                   xy,
-                                   uv,
-                                   refine);
+      return generate_landmarks_v2(min, max, mask, mosaic_to_tile, samples, xy, uv, refine);
   }
 
   return false;
@@ -1513,14 +1437,12 @@ generate_landmarks(const image_t * tile,
 
 //----------------------------------------------------------------
 // calc_size
-// 
+//
 // Given a bounding box expressed in the image space and
 // pixel spacing, calculate corresponding image size.
-// 
+//
 image_t::SizeType
-calc_size(const pnt2d_t & min,
-          const pnt2d_t & max,
-          const double & spacing)
+calc_size(const pnt2d_t & min, const pnt2d_t & max, const double & spacing)
 {
   image_t::SizeType sz;
   sz[0] = (unsigned int)((ceilf(max[0]) - floor(min[0])) / spacing);
@@ -1534,140 +1456,140 @@ the_thread_pool_t * save_mosaic::_pthread_pool;
 
 //----------------------------------------------------------------
 // hsv_to_rgb
-// 
+//
 // Convenience function for converting between HSV/RGB color
 // spaces. This is used for colormapping.
-// 
+//
 xyz_t
-	hsv_to_rgb(const xyz_t & HSV)
+hsv_to_rgb(const xyz_t & HSV)
 {
-	double H = HSV[0];
-	double S = HSV[1];
-	double V = HSV[2];
+  double H = HSV[0];
+  double S = HSV[1];
+  double V = HSV[2];
 
-	xyz_t RGB;
-	double & R = RGB[0];
-	double & G = RGB[1];
-	double & B = RGB[2];
+  xyz_t    RGB;
+  double & R = RGB[0];
+  double & G = RGB[1];
+  double & B = RGB[2];
 
-	if (S == 0.0)
-	{
-		// monochromatic:
-		R = V;
-		G = V;
-		B = V;
-		return RGB;
-	}
+  if (S == 0.0)
+  {
+    // monochromatic:
+    R = V;
+    G = V;
+    B = V;
+    return RGB;
+  }
 
-	H *= 6.0;
-	double i = floor(H);
-	double f = H - i;
+  H *= 6.0;
+  double i = floor(H);
+  double f = H - i;
 
-	double p = V * (1.0 - S);
-	double q = V * (1.0 - S * f);
-	double t = V * (1.0 - S * (1 - f));
+  double p = V * (1.0 - S);
+  double q = V * (1.0 - S * f);
+  double t = V * (1.0 - S * (1 - f));
 
-	if (i == 0.0)
-	{
-		R = V;
-		G = t;
-		B = p;
-	}
-	else if (i == 1.0)
-	{
-		R = q;
-		G = V;
-		B = p;
-	}
-	else if (i == 2.0)
-	{
-		R = p;
-		G = V;
-		B = t;
-	}
-	else if (i == 3.0)
-	{
-		R = p;
-		G = q;
-		B = V;
-	}
-	else if (i == 4.0)
-	{
-		R = t;
-		G = p;
-		B = V;
-	}
-	else
-	{ 
-		// i == 5.0
-		R = V;
-		G = p;
-		B = q;
-	}
+  if (i == 0.0)
+  {
+    R = V;
+    G = t;
+    B = p;
+  }
+  else if (i == 1.0)
+  {
+    R = q;
+    G = V;
+    B = p;
+  }
+  else if (i == 2.0)
+  {
+    R = p;
+    G = V;
+    B = t;
+  }
+  else if (i == 3.0)
+  {
+    R = p;
+    G = q;
+    B = V;
+  }
+  else if (i == 4.0)
+  {
+    R = t;
+    G = p;
+    B = V;
+  }
+  else
+  {
+    // i == 5.0
+    R = V;
+    G = p;
+    B = q;
+  }
 
-	return RGB;
+  return RGB;
 }
 
 //----------------------------------------------------------------
 // rgb_to_hsv
-// 
+//
 // Convenience function for converting between RGB/HSV color
 // spaces. This is used for colormapping.
-// 
+//
 xyz_t
-	rgb_to_hsv(const xyz_t & RGB)
+rgb_to_hsv(const xyz_t & RGB)
 {
-	double R = RGB[0];
-	double G = RGB[1];
-	double B = RGB[2];
+  double R = RGB[0];
+  double G = RGB[1];
+  double B = RGB[2];
 
-	xyz_t HSV;
-	double & H = HSV[0];
-	double & S = HSV[1];
-	double & V = HSV[2];
+  xyz_t    HSV;
+  double & H = HSV[0];
+  double & S = HSV[1];
+  double & V = HSV[2];
 
-	double min = std::min(R, std::min(G, B));
-	double max = std::max(R, std::max(G, B));
-	V = max;
+  double min = std::min(R, std::min(G, B));
+  double max = std::max(R, std::max(G, B));
+  V = max;
 
-	double delta = max - min;
-	if (max == 0)
-	{ 
-		S = 0;
-		H = -1;
-	}
-	else
-	{
-		S = delta / max;
+  double delta = max - min;
+  if (max == 0)
+  {
+    S = 0;
+    H = -1;
+  }
+  else
+  {
+    S = delta / max;
 
-		if (delta == 0)
-		{
-			delta = 1;
-		}
+    if (delta == 0)
+    {
+      delta = 1;
+    }
 
-		if (R == max)
-		{
-			// between yellow & magenta
-			H = (G - B) / delta;
-		}
-		else if (G == max)
-		{ 
-			// between cyan & yellow
-			H = (B - R) / delta + 2;
-		}
-		else
-		{
-			// between magenta & cyan
-			H = (R - G) / delta + 4;
-		}
+    if (R == max)
+    {
+      // between yellow & magenta
+      H = (G - B) / delta;
+    }
+    else if (G == max)
+    {
+      // between cyan & yellow
+      H = (B - R) / delta + 2;
+    }
+    else
+    {
+      // between magenta & cyan
+      H = (R - G) / delta + 4;
+    }
 
-		H /= 6.0;
+    H /= 6.0;
 
-		if (H < 0.0)
-		{ 
-			H = H + 1.0;
-		}
-	}
+    if (H < 0.0)
+    {
+      H = H + 1.0;
+    }
+  }
 
-	return HSV;
+  return HSV;
 }
