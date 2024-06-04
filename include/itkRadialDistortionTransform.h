@@ -77,8 +77,8 @@ public:
   typedef Transform<TScalar, 2, 2> Superclass;
 
   // Base inverse transform type:
-  typedef typename Superclass::InverseTransformType InverseTransformType;
-  typedef SmartPointer<InverseTransformType>        InverseTransformPointer;
+  typedef Superclass                         InverseTransformType;
+  typedef SmartPointer<InverseTransformType> InverseTransformPointer;
 
   // static constant for the number of polynomial coefficients:
   itkStaticConstMacro(Nk, unsigned int, N);
@@ -137,16 +137,14 @@ public:
     return this->m_Parameters;
   }
 
-  // virtual: mumber of parameters that define this transform:
-  unsigned int
-  GetNumberOfParameters() const
+  IdentifierType
+  GetNumberOfParameters() const override
   {
     return N + 2;
   }
 
-  // virtual:
-  const JacobianType &
-  GetJacobian(const InputPointType & point) const;
+  void
+  ComputeJacobianWithRespectToParameters(const InputPointType & point, JacobianType & jacobian) const override;
 
   // virtual: return an inverse of this transform.
   InverseTransformPointer

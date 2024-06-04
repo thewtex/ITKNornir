@@ -80,7 +80,7 @@ public:
   typedef Transform<double, 2, 2> Superclass;
 
   // Base inverse transform type:
-  typedef Superclass::InverseTransformType   InverseTransformType;
+  typedef Superclass                         InverseTransformType;
   typedef SmartPointer<InverseTransformType> InverseTransformPointer;
 
   // RTTI:
@@ -141,9 +141,8 @@ public:
     return this->m_Parameters;
   }
 
-  // virtual:
-  unsigned int
-  GetNumberOfParameters() const
+  IdentifierType
+  GetNumberOfParameters() const override
   {
     return this->m_Parameters.size();
   }
@@ -154,8 +153,8 @@ public:
 
   // setup the transform parameters:
   void
-  setup( // image bounding box expressed in the image space,
-         // defines transform normalization parameters:
+  setup(                              // image bounding box expressed in the image space,
+                                      // defines transform normalization parameters:
     const OutputPointType & tile_min, // tile space
     const OutputPointType & tile_max, // tile space
 
@@ -164,9 +163,8 @@ public:
     const InputPointType *  uv,      // mosaic space
     const OutputPointType * xy);     // tile space
 
-  // virtual:
-  const JacobianType &
-  GetJacobian(const InputPointType & point) const;
+  void
+  ComputeJacobianWithRespectToParameters(const InputPointType & point, JacobianType & jacobian) const override;
 
 #if 0
     // helper required for numeric inverse transform calculation;

@@ -579,8 +579,9 @@ calc_tile_mosaic_bbox(const base_transform_t * mosaic_to_tile,
     return true;
   }
 
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
-  if (tile_to_mosaic.GetPointer() == NULL)
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile->GetInverse(tile_to_mosaic);
+  if (tile_to_mosaic.GetPointer() == nullptr)
   {
     return false;
   }
@@ -681,7 +682,8 @@ find_inverse(const pnt2d_t &          tile_min, // tile space
              const double             min_error_sqrd,
              const unsigned int       pick_up_pace_steps)
 {
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile->GetInverse(tile_to_mosaic);
   return find_inverse(tile_min,
                       tile_max,
                       mosaic_to_tile,
@@ -980,8 +982,9 @@ generate_landmarks_v1(const pnt2d_t &          tile_min,
 {
   // #define DEBUG_LANDMARKS
 
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
-  if (tile_to_mosaic.GetPointer() == NULL)
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile->GetInverse(tile_to_mosaic);
+  if (tile_to_mosaic.GetPointer() == nullptr)
   {
     return false;
   }
@@ -1185,8 +1188,9 @@ generate_landmarks_v2(const pnt2d_t &          tile_min,
 {
   // #define DEBUG_LANDMARKS
 
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile->GetInverse();
-  if (tile_to_mosaic.GetPointer() == NULL)
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile->GetInverse(tile_to_mosaic);
+  if (tile_to_mosaic.GetPointer() == nullptr)
   {
     return false;
   }

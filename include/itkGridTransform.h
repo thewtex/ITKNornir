@@ -65,7 +65,7 @@ public:
   typedef Transform<double, 2, 2> Superclass;
 
   // Base inverse transform type:
-  typedef Superclass::InverseTransformType   InverseTransformType;
+  typedef Superclass                         InverseTransformType;
   typedef SmartPointer<InverseTransformType> InverseTransformPointer;
 
   // RTTI:
@@ -233,8 +233,8 @@ public:
   }
 
   // virtual:
-  unsigned int
-  GetNumberOfParameters() const
+  Superclass::NumberOfParametersType
+  GetNumberOfParameters() const override
   {
     return 2 * transform_.grid_.mesh_.size();
   }
@@ -255,7 +255,6 @@ public:
     transform_ = transform;
     GetParameters();
     GetFixedParameters();
-    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
     this->m_FixedParameters[0] = is_inverse ? 1.0 : 0.0;
   }
 
@@ -266,9 +265,8 @@ public:
     return this->m_FixedParameters[0] != 0.0;
   }
 
-  // virtual:
-  const JacobianType &
-  GetJacobian(const InputPointType & point) const
+  void
+  ComputeJacobianWithRespectToParameters(const InputPointType & point, JacobianType & jacobian) const override
   {
     // FIXME: 20061227 -- this function was written and not tested:
 
@@ -281,26 +279,23 @@ public:
 
     unsigned int idx[3];
     double       jac[12];
-    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
-    this->m_Jacobian.Fill(0.0);
+    jacobian.SetSize(2, GetNumberOfParameters());
+    jacobian.Fill(0.0);
     if (transform_.jacobian(point, idx, jac))
     {
       for (unsigned int i = 0; i < 3; i++)
       {
         unsigned int addr = idx[i] * 2;
-        this->m_Jacobian(0, addr) = Su * jac[i * 2];
-        this->m_Jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
-        this->m_Jacobian(1, addr) = Sv * jac[i * 2 + 6];
-        this->m_Jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
+        jacobian(0, addr) = Su * jac[i * 2];
+        jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
+        jacobian(1, addr) = Sv * jac[i * 2 + 6];
+        jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
       }
     }
-
-    return this->m_Jacobian;
   }
 
 protected:
   GridTransform()
-    : Superclass(2, 0)
   {
     this->m_FixedParameters.SetSize(7);
 

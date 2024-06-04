@@ -114,11 +114,6 @@ extern const char * g_Version;
 typedef itk::Size<2>::SizeValueType image_size_value_t;
 
 //----------------------------------------------------------------
-// array2d
-//
-#define array2d(T) std::vector<std::vector<T>>
-
-//----------------------------------------------------------------
 // mask_t
 //
 // 2D image with unsigned char pixel type.
@@ -1415,7 +1410,7 @@ template <class T>
 std::vector<typename itk::ImageRegionConstIteratorWithIndex<T>>
 DivideROIAmongThreads(typename T::ConstPointer fi,
                       typename T::RegionType   roi,
-                      int                      num_Threads = boost::thread::hardware_concurrency())
+                      int                      num_Threads = std::thread::hardware_concurrency())
 {
   typedef typename itk::ImageRegionConstIteratorWithIndex<T> itex_t;
   typedef typename T::IndexType                              index_t;
@@ -1487,7 +1482,7 @@ template <class T>
 std::vector<typename itk::ImageRegionIteratorWithIndex<T>>
 DivideROIAmongThreads(typename T::Pointer    fi,
                       typename T::RegionType roi,
-                      int                    num_Threads = boost::thread::hardware_concurrency())
+                      int                    num_Threads = std::thread::hardware_concurrency())
 {
   typedef typename itk::ImageRegionIteratorWithIndex<T> itex_t;
   typedef typename T::IndexType                         index_t;
@@ -2003,7 +1998,7 @@ my_metric_mt(double & area,
              const mask_t *                 mi_mask,
 
              const TInterpolator * mi_interpolator,
-             int                   num_Threads = boost::thread::hardware_concurrency())
+             int                   num_Threads = std::thread::hardware_concurrency())
 {
   // return my_metric(area, fi, mi, fi_to_mi, fi_mask, mi_mask, mi_interpolator);
 
@@ -3699,7 +3694,7 @@ make_mosaic(const typename IMG::SpacingType &                       mosaic_sp,
             typename IMG::PixelType background = 255.0,
 
             bool      dont_allocate = false,
-            const int num_threads = boost::thread::hardware_concurrency())
+            const int num_threads = std::thread::hardware_concurrency())
 {
   // NOTE: for backwards compatibility we do not assemble the mosaic mask:
   const bool      assemble_mosaic_mask = false;
@@ -4626,7 +4621,7 @@ make_mask(const mask_t::SpacingType &                             mosaic_sp,
           const std::vector<bool> &                               omit,
           const std::vector<typename transform_t::ConstPointer> & transform,
           const std::vector<mask_t::ConstPointer> &               image_mask,
-          unsigned int                                            num_threads = boost::thread::hardware_concurrency())
+          unsigned int                                            num_threads = std::thread::hardware_concurrency())
 {
   return make_mask_mt<transform_t>(num_threads, mosaic_sp, num_images, omit, transform, image_mask);
 }
@@ -4640,7 +4635,7 @@ template <class transform_t>
 mask_t::Pointer
 make_mask(const std::vector<typename transform_t::ConstPointer> & transform,
           const std::vector<typename mask_t::ConstPointer> &      image_mask,
-          unsigned int                                            num_threads = boost::thread::hardware_concurrency())
+          unsigned int                                            num_threads = std::thread::hardware_concurrency())
 {
   const unsigned int num_images = transform.size();
   return make_mask<transform_t>(
@@ -5159,8 +5154,8 @@ save_rgb(const char *             fn_save,
 inline static translate_transform_t::Pointer
 inverse(const translate_transform_t * transform)
 {
-  translate_transform_t::Pointer inv = NULL;
-  if (transform != NULL)
+  translate_transform_t::Pointer inv;
+  if (transform != nullptr)
   {
     inv = translate_transform_t::New();
     inv->SetOffset(neg(transform->GetOffset()));
@@ -6300,8 +6295,9 @@ approx_transform(const pnt2d_t &          tile_min,
                  const unsigned int       version = 1,
                  const bool               refine = false)
 {
-  base_transform_t::Pointer inverse = forward->GetInverse();
-  assert(inverse.GetPointer() != NULL);
+  base_transform_t::Pointer inverse;
+  forward->GetInverse(inverse);
+  assert(inverse.GetPointer() != nullptr);
 
   // calculate the shift:
   pnt2d_t center =
@@ -6434,8 +6430,9 @@ solve_for_transform(const pnt2d_t &                          tile_min,
                     const unsigned int                       version = 1,
                     const bool                               refine = false)
 {
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile_0->GetInverse();
-  assert(tile_to_mosaic.GetPointer() != NULL);
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile_0->GetInverse(tile_to_mosaic);
+  assert(tile_to_mosaic.GetPointer() != nullptr);
 
   // calculate the shift:
   pnt2d_t center =
@@ -6467,7 +6464,8 @@ solve_for_transform(const T *                                tile,
                     const unsigned int                       version = 1,
                     const bool                               refine = false)
 {
-  base_transform_t::Pointer tile_to_mosaic = mosaic_to_tile_0->GetInverse();
+  base_transform_t::Pointer tile_to_mosaic;
+  mosaic_to_tile_0->GetInverse(tile_to_mosaic);
   assert(tile_to_mosaic.GetPointer() != NULL);
 
   typename T::SizeType    sz = tile->GetLargestPossibleRegion().GetSize();

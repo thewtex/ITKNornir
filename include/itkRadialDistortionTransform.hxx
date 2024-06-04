@@ -44,7 +44,6 @@ namespace itk
 //
 template <class TScalar, unsigned int N>
 RadialDistortionTransform<TScalar, N>::RadialDistortionTransform()
-  : Superclass(2, N + 2) // there are k0, k1,.. kN-1, tx, ty parameters:
 {
   // by default, the parameters are initialized for an identity transform:
   this->m_Parameters[0] = 1.0;
@@ -139,12 +138,10 @@ RadialDistortionTransform<TScalar, N>::BackTransformPoint(const OutputPointType 
   return x;
 }
 
-//----------------------------------------------------------------
-// GetJacobian
-//
 template <class TScalar, unsigned int N>
-const typename RadialDistortionTransform<TScalar, N>::JacobianType &
-RadialDistortionTransform<TScalar, N>::GetJacobian(const InputPointType & x) const
+void
+RadialDistortionTransform<TScalar, N>::ComputeJacobianWithRespectToParameters(const InputPointType & x,
+                                                                              JacobianType &         jacobian) const
 {
   const double & ac = this->m_FixedParameters[0];
   const double & bc = this->m_FixedParameters[1];
@@ -168,8 +165,8 @@ RadialDistortionTransform<TScalar, N>::GetJacobian(const InputPointType & x) con
   double RRmax2n = double(1);
   for (unsigned int n = 0; n < N; n++)
   {
-    this->m_Jacobian(0, n) = A * RRmax2n;
-    this->m_Jacobian(1, n) = B * RRmax2n;
+    jacobian(0, n) = A * RRmax2n;
+    jacobian(1, n) = B * RRmax2n;
     RRmax2n *= RRmax2;
   }
 
@@ -192,13 +189,11 @@ RadialDistortionTransform<TScalar, N>::GetJacobian(const InputPointType & x) con
 
   double S = this->m_Parameters[0] + RRmax2 * P;
 
-  this->m_Jacobian(0, N) = Rmax * S + (double(2) * A2 / Rmax) * Q;     // dx/dta
-  this->m_Jacobian(1, N + 1) = Rmax * S + (double(2) * B2 / Rmax) * Q; // dy/dtb
+  jacobian(0, N) = Rmax * S + (double(2) * A2 / Rmax) * Q;     // dx/dta
+  jacobian(1, N + 1) = Rmax * S + (double(2) * B2 / Rmax) * Q; // dy/dtb
 
-  this->m_Jacobian(0, N + 1) = ((double(2) * A * B) / Rmax) * Q; // dx/dtb
-  this->m_Jacobian(1, N) = this->m_Jacobian(0, N + 1);           // dy/dta
-
-  return this->m_Jacobian;
+  jacobian(0, N + 1) = ((double(2) * A * B) / Rmax) * Q; // dx/dtb
+  jacobian(1, N) = jacobian(0, N + 1);                   // dy/dta
 }
 
 //----------------------------------------------------------------
