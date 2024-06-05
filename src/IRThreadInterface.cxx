@@ -27,12 +27,12 @@
 // Description  : An abstract thread class interface.
 
 // local includes:
-#include "thread/the_thread_interface.hxx"
-#include "thread/the_thread_pool.hxx"
-#include "thread/the_mutex_interface.hxx"
-#include "thread/the_terminator.hxx"
-#include "thread/the_transaction.hxx"
-#include "utils/the_utils.hxx"
+#include "IRThreadInterface.h"
+#include "IRThreadPool.h"
+#include "IRMutexInterface.h"
+#include "IRTerminator.h"
+#include "IRTransaction.h"
+#include "itkIRUtils.h"
 
 // system includes:
 #include <iostream>

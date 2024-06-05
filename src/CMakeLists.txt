@@ -4,7 +4,7 @@ set(Nornir_SRCS
   itkIRUtils.cxx
   IRTerminator.cxx
   IRThreadStorage.cxx
-  IRThread.cxx
+  IRStdThread.cxx
   IRThreadInterface.cxx
   IRMutex.cxx
   IRMutexInterface.cxx
@@ -17,6 +17,9 @@ set(Nornir_SRCS
   IRGridTransform.cxx
   itkRegularStepGradientDescentOptimizer2.cxx
   itkRBFTransform.cxx
+  IRAABBox.cxx
+  IRTerminator.cxx
+  IRStdMutex.cxx
 )
 
 itk_module_add_library(Nornir ${Nornir_SRCS})

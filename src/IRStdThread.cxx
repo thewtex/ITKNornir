@@ -27,10 +27,10 @@
 // Description  : A thin wrapper for Boost thread class.
 
 // local include:
-#include "IRThread.h"
-#include "IRThreadStorage.h"
-#include "IRMutex.h"
-#include "thread/the_mutex_interface.hxx"
+#include "IRStdThread.h"
+#include "IRStdThreadStorage.h"
+#include "IRStdMutex.h"
+#include "IRMutexInterface.h"
 
 // system includes:
 #include <iostream>
@@ -49,37 +49,37 @@ using std::endl;
 //----------------------------------------------------------------
 // THREAD_STORAGE
 // 
-static the_boost_thread_storage_t THREAD_STORAGE;
+static thread_local the_std_thread_storage_t THREAD_STORAGE;
 
 //----------------------------------------------------------------
-// the_boost_thread_t::the_boost_thread_t
+// the_std_thread_t::the_std_thread_t
 // 
-the_boost_thread_t::the_boost_thread_t():
-  the_thread_interface_t(the_boost_mutex_t::create()),
-  boost_thread_(NULL)
+the_std_thread_t::the_std_thread_t():
+  the_thread_interface_t(the_std_mutex_t::create()),
+  std_thread_(NULL)
 {
-  if (THREAD_STORAGE.get() == NULL)
+  if (THREAD_STORAGE.thread_observer_.get() == nullptr)
   {
-    THREAD_STORAGE.reset(new the_thread_observer_t(*this));
+    THREAD_STORAGE.thread_observer_.reset(new the_thread_observer_t(*this));
   }
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::~the_boost_thread_t
+// the_std_thread_t::~the_std_thread_t
 // 
-the_boost_thread_t::~the_boost_thread_t()
+the_std_thread_t::~the_std_thread_t()
 {
-  if (boost_thread_)
+  if (std_thread_)
   {
     wait();
   }
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::delete_this
+// the_std_thread_t::delete_this
 // 
 void
-the_boost_thread_t::delete_this()
+the_std_thread_t::delete_this()
 {
   delete this;
 }
@@ -88,23 +88,23 @@ the_boost_thread_t::delete_this()
 // ImageProcessingThread::thread_storage
 // 
 the_thread_storage_t &
-the_boost_thread_t::thread_storage()
+the_std_thread_t::thread_storage()
 {
   return THREAD_STORAGE;
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::start
+// the_std_thread_t::start
 // 
 void
-the_boost_thread_t::start()
+the_std_thread_t::start()
 {
   the_lock_t<the_mutex_interface_t> locker(mutex_);
 #ifdef DEBUG_THREAD
   cerr << "start of thread " << this << " requested" << endl;
 #endif
   
-  if (boost_thread_)
+  if (std_thread_)
   {
     if (!stopped_)
     {
@@ -129,68 +129,65 @@ the_boost_thread_t::start()
 #endif
   
   // we shouldn't have a Boost thread at this stage:
-  assert(!boost_thread_);
+  assert(!std_thread_);
   
   // clear the termination flag:
   stopped_ = false;
-  boost_thread_ = new boost::thread(callable_t(this));
+  std_thread_ = new std::thread(callable_t(this));
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::wait
+// the_std_thread_t::wait
 // 
 void
-the_boost_thread_t::wait()
+the_std_thread_t::wait()
 {
-  if (!boost_thread_) return;
+  if (!std_thread_) return;
   
-  if (boost_thread_->get_id() == boost::this_thread::get_id())
+  if (std_thread_->get_id() == std::this_thread::get_id())
   {
     assert(false);
     return;
   }
   
-  boost_thread_->join();
-  delete boost_thread_;
-  boost_thread_ = NULL;
+  std_thread_->join();
+  delete std_thread_;
+  std_thread_ = NULL;
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::take_a_nap
+// the_std_thread_t::take_a_nap
 // 
 void
-the_boost_thread_t::take_a_nap(const unsigned long & microseconds)
+the_std_thread_t::take_a_nap(const unsigned long & microseconds)
 {
-  boost::xtime xt;
-  xt.sec = microseconds / 1000000;
-  xt.nsec = microseconds % 1000000;
-  boost::thread::sleep(xt);
+  std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::terminators
+// the_std_thread_t::terminators
 // 
 the_terminators_t &
-the_boost_thread_t::terminators()
+the_std_thread_t::terminators()
 {
   return terminators_;
 }
 
 //----------------------------------------------------------------
-// the_boost_thread_t::run
+// the_std_thread_t::run
 // 
 void
-the_boost_thread_t::run()
+the_std_thread_t::run()
 {
   // setup the thread storage:
   {
     the_lock_t<the_mutex_interface_t> locker(mutex_);
-    THREAD_STORAGE.reset(new the_thread_observer_t(*this));
+    THREAD_STORAGE.thread_observer_.reset(new the_thread_observer_t(*this));
   }
   
   // process the transactions:
   work();
   
   // clean up the thread storage:
-  THREAD_STORAGE.reset(NULL);
+  THREAD_STORAGE.thread_observer_.reset(nullptr);
 }

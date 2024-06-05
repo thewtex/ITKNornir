@@ -28,18 +28,18 @@
 //                image preprocessing, convenience wrappers for
 //                ITK file and ITK filters.
 
-// local includes:
-#include "itkIRCommon.h"
-#include "itkLegendrePolynomialTransform.h"
-#include "itkGridTransform.h"
-#include "itkMeshTransform.h"
-#include "itkRBFTransform.h"
-#include "itkRadialDistortionTransform.h"
-
 // ITK includes:
 #include <itkTransformFactoryBase.h>
 #include <itkTransformFactory.h>
 #include <itkFixedCenterOfRotationAffineTransform.h>
+
+// local includes:
+#include "itkIRCommon.h"
+#include "itkGridTransform.h"
+#include "itkMeshTransform.h"
+#include "itkRBFTransform.h"
+#include "itkRadialDistortionTransform.h"
+#include "itkNormalizeImageFilterWithMask.h"
 
 // system includes:
 #include <iomanip>

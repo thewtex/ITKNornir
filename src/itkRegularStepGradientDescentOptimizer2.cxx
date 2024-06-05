@@ -246,7 +246,7 @@ RegularStepGradientDescentOptimizer2::AdvanceOneStep()
     magnitudeSquared += weighted * weighted;
   }
 
-  const double gradientMagnitude = vcl_sqrt(magnitudeSquared);
+  const double gradientMagnitude = std::sqrt(magnitudeSquared);
   if (gradientMagnitude < m_GradientMagnitudeTolerance)
   {
     m_StopCondition = GradientMagnitudeTolerance;

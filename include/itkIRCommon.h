@@ -31,33 +31,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef itkIRCommon_h
 #define itkIRCommon_h
 
-// local includes:
-#include "itkIRText.h"
-#include "itkIRUtils.h"
-#include "itkIRTerminator.h"
-#include "itkNormalizeImageFilterWithMask.h"
-#include "itkLegendrePolynomialTransform.h"
-#include "IRThread.h"
-#include "IRTransaction.h"
-#include "IRThreadPool.h"
-// #include "utils/AsyncMosaicSave.h"
-
-// system includes:
-#include <iostream>
-#include <iomanip>
-#include <cstdlib>
-#include <vector>
-#include <list>
-#include <limits>
-
-// namespace access:
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::setw;
-using std::ios;
-using std::flush;
-
 // common:
 #include <itkSimpleFilterWatcher.h>
 #include <itkImageFileReader.h>
@@ -101,6 +74,33 @@ using std::flush;
 #include <itkMultiplyImageFilter.h>
 #include <itkRGBPixel.h>
 #include <itkComposeImageFilter.h>
+
+// local includes:
+#include "itkIRText.h"
+#include "itkIRUtils.h"
+#include "itkIRTerminator.h"
+#include "IRThread.h"
+#include "IRTransaction.h"
+#include "IRThreadPool.h"
+// #include "utils/AsyncMosaicSave.h"
+#include "itkNormalizeImageFilterWithMask.h"
+#include "itkLegendrePolynomialTransform.h"
+
+// system includes:
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+#include <vector>
+#include <list>
+#include <limits>
+
+// namespace access:
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::setw;
+using std::ios;
+using std::flush;
 
 
 #include "IRPath.h"

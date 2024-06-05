@@ -109,6 +109,26 @@ public:
   InputPointType
   BackTransformPoint(const OutputPointType & y) const;
 
+  using InputDiffusionTensor3DType = typename Superclass::InputDiffusionTensor3DType;
+  using OutputDiffusionTensor3DType = typename Superclass::OutputDiffusionTensor3DType;
+  OutputDiffusionTensor3DType
+  TransformDiffusionTensor3D(const InputDiffusionTensor3DType & inputTensor, const InputPointType & point) const override
+  {
+    itkExceptionMacro("TransformDiffusionTensor3D( const InputDiffusionTensor3DType & ) is "
+                      "unimplemented for "
+                      << this->GetNameOfClass());
+  }
+
+  using InputVectorPixelType = typename Superclass::InputVectorPixelType;
+  using OutputVectorPixelType = typename Superclass::OutputVectorPixelType;
+  OutputVectorPixelType
+  TransformDiffusionTensor3D(const InputVectorPixelType & inputTensor, const InputPointType & point) const override
+  {
+    itkExceptionMacro("TransformDiffusionTensor3D( const InputVectorPixelType & ) is "
+                      "unimplemented for "
+                      << this->GetNameOfClass());
+  }
+
   // virtual:
   void
   SetFixedParameters(const ParametersType & params)

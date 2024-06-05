@@ -274,7 +274,7 @@ RBFTransform::setup(                // image bounding box expressed in the image
 //
 void
 RBFTransform::ComputeJacobianWithRespectToParameters(const InputPointType & point,
-                                                     JacobianType &         jacobian) const override
+                                                     JacobianType &         jacobian) const
 {
   // shortcuts:
   const double & Xmax = GetXmax();

@@ -30,7 +30,6 @@
 // local includes:
 #include "IRTerminator.h"
 #include "IRException.h"
-#include "IRThreadStorage.h"
 
 // system includes:
 #include <exception>

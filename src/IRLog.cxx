@@ -27,7 +27,7 @@
 // Description  : A text log object -- behaves almost like a std::ostream.
 
 // local includes:
-#include "the_log.hxx"
+#include "IRLog.h"
 
 
 //----------------------------------------------------------------

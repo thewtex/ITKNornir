@@ -40,7 +40,7 @@
 #include <list>
 
 // local includes:
-#include "IRTerminator.h"
+#include "IRThreadStorage.h"
 #include "itkIRUtils.h"
 
 

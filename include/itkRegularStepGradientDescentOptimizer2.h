@@ -38,7 +38,7 @@
 #include <itkSingleValuedNonLinearOptimizer.h>
 
 // the includes:
-#include <utils/the_log.hxx>
+#include "IRLog.h"
 
 
 namespace itk

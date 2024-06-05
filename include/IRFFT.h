@@ -88,7 +88,7 @@ namespace itk_fft
     void fill(const float real, const float imag = 0.0);
     
     void setup(const itk_imageptr_t & real,
-	       const itk_imageptr_t & imag = itk_imageptr_t(NULL));
+	       const itk_imageptr_t & imag = itk_imageptr_t());
     
     // ITK helpers:
     itk_imageptr_t component(const bool imag = 0) const;

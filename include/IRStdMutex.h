@@ -19,56 +19,58 @@
 */
 
 
-// File         : optimizer_observer.hxx
+// File         : the_boost_mutex.hxx
 // Author       : Pavel A. Koshevoy
-// Created      : Fri Mar 23 12:47:03 MDT 2007
+// Created      : Sat Oct 25 12:33:43 MDT 2008
 // Copyright    : (C) 2004-2008 University of Utah
 // License      : GPLv2
-// Description  : An optimizer observer class.
+// Description  : A thin wrapper for Boost mutex class.
 
-#ifndef OPTIMIZER_OBSERVER_HXX_
-#define OPTIMIZER_OBSERVER_HXX_
+#ifndef THE_BOOST_MUTEX_HXX_
+#define THE_BOOST_MUTEX_HXX_
 
-// the includes:
-#include "IRLog.h"
+// local includes:
+#include "IRMutexInterface.h"
 
-// ITK includes:
-#include <itkCommand.h>
+// Boost includes:
+#include <mutex>
 
 
 //----------------------------------------------------------------
-// optimizer_observer_t
-//
-template <typename TOptimizer>
-class optimizer_observer_t : public itk::Command
+// the_boost_mutex_t
+// 
+class the_std_mutex_t : public the_mutex_interface_t
 {
 public:
-  typedef optimizer_observer_t Self;
-  typedef itk::Command Superclass;
-  typedef itk::SmartPointer<Self> Pointer;
+  the_std_mutex_t();
   
-  itkNewMacro(Self);
+  // the destructor is protected on purpose,
+  // see delete_this for details:
+  virtual ~the_std_mutex_t();
   
-  void Execute(itk::Object *caller, const itk::EventObject & event)
-  { Execute((const itk::Object *)(caller), event); }
+  // In order to avoid memory management problems with shared libraries,
+  // whoever provides this interface instance (via it's creator), has to
+  // provide a way to delete the instance as well.  This will avoid
+  // issues with multiple-instances of C runtime libraries being
+  // used by the app and whatever libraries it links against that
+  // either use or provide this interface:
+  virtual void delete_this();
   
-  void Execute(const itk::Object * object, const itk::EventObject & event)
-  {
-    if (typeid(event) != typeid(itk::IterationEvent)) return;
-    
-    const TOptimizer * optimizer = dynamic_cast<const TOptimizer *>(object);
-    *log_ << (unsigned int)(optimizer->GetCurrentIteration()) << '\t'
-	  << optimizer->GetValue() << '\t'
-	  << optimizer->GetCurrentPosition() << endl;
-  }
+  // the creation method:
+  static the_mutex_interface_t * create();
   
-  the_log_t * log_;
+  // virtual:
+  void lock();
   
-protected:
-  optimizer_observer_t():
-    log_(cerr_log())
-  {}
+  // virtual:
+  void unlock();
+  
+  // virtual:
+  bool try_lock();
+  
+private:
+  std::mutex mutex_;
 };
 
 
-#endif // OPTIMIZER_OBSERVER_HXX_
+#endif // THE_BOOST_MUTEX_HXX_

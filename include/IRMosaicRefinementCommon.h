@@ -32,10 +32,10 @@
 // the includes:
 #include <itkIRCommon.h>
 #include <IRGridCommon.h>
-#include <itk/itkImageMosaicVarianceMetric.h>
-#include <itk/itkRegularStepGradientDescentOptimizer2.h>
-#include <math/the_aa_bbox.hxx>
-#include <thread/the_thread_pool.hxx>
+#include <itkImageMosaicVarianceMetric.h>
+#include <itkRegularStepGradientDescentOptimizer2.h>
+#include <IRAABBox.h>
+#include <IRThreadPool.h>
 
 #include "itkImageDuplicator.h"
 

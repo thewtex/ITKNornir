@@ -31,9 +31,9 @@
 #include <assert.h>
 
 // local includes:
-#include "thread/the_transaction.hxx"
-#include "thread/the_thread_interface.hxx"
-#include "thread/the_mutex_interface.hxx"
+#include "IRTransaction.h"
+#include "IRThreadInterface.h"
+#include "IRMutexInterface.h"
 
 
 //----------------------------------------------------------------

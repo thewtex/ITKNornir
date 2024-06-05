@@ -175,7 +175,7 @@ ImageMosaicVarianceMetric<TImage, TInterpolator>::GetNumberOfParameters() const
 //
 template <class TImage, class TInterpolator>
 void
-ImageMosaicVarianceMetric<TImage, TInterpolator>::Initialize() throw(ExceptionObject)
+ImageMosaicVarianceMetric<TImage, TInterpolator>::Initialize()
 {
 #if 0
   cout << "sizeof(pixel_t) = " << sizeof(pixel_t) << endl
@@ -357,7 +357,7 @@ ImageMosaicVarianceMetric<TImage, TInterpolator>::GetValueAndDerivative(const pa
 
   // reset the accumulators:
   derivative = derivative_t(n_concat);
-  derivative.Fill(NumericTraits<ITK_TYPENAME derivative_t::ValueType>::Zero);
+  derivative.Fill(NumericTraits<typename derivative_t::ValueType>::Zero);
   measure = NumericTraits<measure_t>::Zero;
   m_NumberOfPixelsCounted = 0;
 

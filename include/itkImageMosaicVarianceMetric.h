@@ -34,7 +34,6 @@
 #include <itkTransform.h>
 #include <itkInterpolateImageFunction.h>
 #include <itkSingleValuedCostFunction.h>
-#include <itkExceptionObject.h>
 #include <itkGradientRecursiveGaussianImageFilter.h>
 
 /** .
@@ -168,7 +167,7 @@ public:
       are present and plugged together correctly.
   */
   virtual void
-  Initialize() throw(ExceptionObject);
+  Initialize();
 
   /** virtual: Get the value for single valued optimizers. */
   measure_t
