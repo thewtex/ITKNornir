@@ -30,10 +30,10 @@
 #define THE_BOOST_MUTEX_HXX_
 
 // local includes:
-#include "thread/the_mutex_interface.hxx"
+#include "IRMutexInterface.h"
 
 // Boost includes:
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 
 //----------------------------------------------------------------
@@ -69,7 +69,7 @@ public:
   bool try_lock();
   
 private:
-  boost::mutex mutex_;
+  std::mutex mutex_;
 };
 
 

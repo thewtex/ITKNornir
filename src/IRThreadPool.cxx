@@ -27,10 +27,10 @@
 // Description  : A thread pool class.
 
 // local includes:
-#include "thread/the_thread_pool.hxx"
-#include "thread/the_transaction.hxx"
-#include "thread/the_mutex_interface.hxx"
-#include "utils/the_utils.hxx"
+#include "IRThreadPool.h"
+#include "IRTransaction.h"
+#include "IRMutexInterface.h"
+#include "itkIRUtils.h"
 
 // system includes:
 #include <iostream>
