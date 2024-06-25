@@ -31,10 +31,11 @@
 #define FFT_HXX_
 
 // FFTW includes:
-#include <fftw3.h>
+// #include <fftw3.h>
 
 // ITK includes:
 #include <itkImage.h>
+#include <itkComplexToComplexFFTImageFilter.h>
 
 // system includes:
 #include <complex>
@@ -44,11 +45,12 @@
 
 namespace itk_fft
 {
+  using TransformDirectionEnum = itk::ComplexToComplexFFTImageFilterEnums::TransformDirection;
   //----------------------------------------------------------------
   // set_num_fftw_threads
   //
   // set's number of threads used by fftw, returns previous value:
-  extern std::size_t set_num_fftw_threads(std::size_t num_threads);
+  // extern std::size_t set_num_fftw_threads(std::size_t num_threads);
   
   //----------------------------------------------------------------
   // itk_image_t
@@ -66,12 +68,22 @@ namespace itk_fft
   typedef std::complex<float> fft_complex_t;
   
   //----------------------------------------------------------------
+  // itk_complex_image_t
+  // 
+  typedef itk::Image<fft_complex_t, 2> itk_complex_image_t;
+  
+  //----------------------------------------------------------------
+  // itk_complex_imageptr_t
+  // 
+  typedef itk_complex_image_t::Pointer itk_complex_imageptr_t;
+
+  //----------------------------------------------------------------
   // fft_data_t
   // 
   class fft_data_t
   {
   public:
-    fft_data_t(): data_(NULL), nx_(0), ny_(0) {}
+    fft_data_t(): image_(), nx_(0), ny_(0) {}
     fft_data_t(const unsigned int w, const unsigned int h);
     explicit fft_data_t(const itk_imageptr_t & real);
     fft_data_t(const itk_imageptr_t & real,
@@ -105,8 +117,8 @@ namespace itk_fft
     void apply_lp_filter(const double r, const double s = 0);
     
     // accessors:
-    inline const fft_complex_t * data() const { return data_; }
-    inline       fft_complex_t * data()       { return data_; }
+    inline const itk_complex_image_t * data() const { return image_.get(); }
+    inline       itk_complex_image_t * data()       { return image_.get(); }
     
     inline unsigned int nx() const { return nx_; }
     inline unsigned int ny() const { return ny_; }
@@ -121,14 +133,14 @@ namespace itk_fft
     
     inline const fft_complex_t & at(const unsigned int & x,
 				    const unsigned int & y) const
-    { return data_[y + ny_ * x]; }
+    { return image_->GetPixel({ x, y }); }
     
     inline fft_complex_t & at(const unsigned int & x,
 			      const unsigned int & y)
-    { return data_[y + ny_ * x]; }
+    { return image_->GetPixel({ x, y }); }
     
   protected:
-    fft_complex_t * data_;
+    itk_complex_imageptr_t image_;
     unsigned int nx_;
     unsigned int ny_;
   };
@@ -144,7 +156,7 @@ namespace itk_fft
   // fft
   // 
   extern bool
-  fft(const fft_data_t & in, fft_data_t & out, int sign = FFTW_FORWARD);
+  fft(const fft_data_t & in, fft_data_t & out, TransformDirectionEnum sign = TransformDirectionEnum::FORWARD);
   
   //----------------------------------------------------------------
   // ifft
@@ -168,146 +180,146 @@ namespace itk_fft
   }
   
   
-  //----------------------------------------------------------------
-  // fn_fft_c_t
-  // 
-  typedef fft_complex_t(*fn_fft_c_t)(const fft_complex_t & in);
+  // //----------------------------------------------------------------
+  // // fn_fft_c_t
+  // // 
+  // typedef fft_complex_t(*fn_fft_c_t)(const fft_complex_t & in);
   
-  //----------------------------------------------------------------
-  // fn_fft_cc_t
-  // 
-  typedef fft_complex_t(*fn_fft_cc_t)(const fft_complex_t & a,
-				      const fft_complex_t & b);
+  // //----------------------------------------------------------------
+  // // fn_fft_cc_t
+  // // 
+  // typedef fft_complex_t(*fn_fft_cc_t)(const fft_complex_t & a,
+	// 			      const fft_complex_t & b);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fn_fft_c_t f,
-	       const fft_data_t & in,
-	       fft_data_t & out);
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fn_fft_c_t f,
+	//        const fft_data_t & in,
+	//        fft_data_t & out);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fft_complex_t(*f)(const float & a,
-				 const fft_complex_t & b),
-	       const float & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fft_complex_t(*f)(const float & a,
+	// 			 const fft_complex_t & b),
+	//        const float & a,
+	//        const fft_data_t & b,
+	//        fft_data_t & c);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const float & b),
-	       const fft_data_t & a,
-	       const float & b,
-	       fft_data_t & c);
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
+	// 			 const float & b),
+	//        const fft_data_t & a,
+	//        const float & b,
+	//        fft_data_t & c);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const fft_complex_t & b),
-	       const fft_complex_t & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
+	// 			 const fft_complex_t & b),
+	//        const fft_complex_t & a,
+	//        const fft_data_t & b,
+	//        fft_data_t & c);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const fft_complex_t & b),
-	       const fft_data_t & a,
-	       const fft_complex_t & b,
-	       fft_data_t & c);
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
+	// 			 const fft_complex_t & b),
+	//        const fft_data_t & a,
+	//        const fft_complex_t & b,
+	//        fft_data_t & c);
   
-  //----------------------------------------------------------------
-  // elem_by_elem
-  // 
-  extern void
-  elem_by_elem(fn_fft_cc_t f,
-	       const fft_data_t & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
-  
-  
-  //----------------------------------------------------------------
-  // conj
-  // 
-  // element-by-element complex conjugate:
-  // 
-  inline void
-  conj(const fft_data_t & in, fft_data_t & out)
-  { elem_by_elem(std::conj, in, out); }
-  
-  //----------------------------------------------------------------
-  // conj
-  // 
-  inline fft_data_t
-  conj(const fft_data_t & in)
-  {
-    fft_data_t out;
-    conj(in, out);
-    return out;
-  }
+  // //----------------------------------------------------------------
+  // // elem_by_elem
+  // // 
+  // extern void
+  // elem_by_elem(fn_fft_cc_t f,
+	//        const fft_data_t & a,
+	//        const fft_data_t & b,
+	//        fft_data_t & c);
   
   
-  //----------------------------------------------------------------
-  // sqrt
-  // 
-  // element-by-element square root:
-  // 
-  inline void
-  sqrt(const fft_data_t & in, fft_data_t & out)
-  { elem_by_elem(std::sqrt, in, out); }
+  // //----------------------------------------------------------------
+  // // conj
+  // // 
+  // // element-by-element complex conjugate:
+  // // 
+  // inline void
+  // conj(const fft_data_t & in, fft_data_t & out)
+  // { elem_by_elem(std::conj, in, out); }
   
-  //----------------------------------------------------------------
-  // sqrt
-  // 
-  inline fft_data_t
-  sqrt(const fft_data_t & in)
-  {
-    fft_data_t out;
-    sqrt(in, out);
-    return out;
-  }
+  // //----------------------------------------------------------------
+  // // conj
+  // // 
+  // inline fft_data_t
+  // conj(const fft_data_t & in)
+  // {
+  //   fft_data_t out;
+  //   conj(in, out);
+  //   return out;
+  // }
   
   
-  //----------------------------------------------------------------
-  // _mul
-  //
-  template <class a_t, class b_t>
-  inline fft_complex_t
-  _mul(const a_t & a, const b_t & b)
-  { return a * b; }
+  // //----------------------------------------------------------------
+  // // sqrt
+  // // 
+  // // element-by-element square root:
+  // // 
+  // inline void
+  // sqrt(const fft_data_t & in, fft_data_t & out)
+  // { elem_by_elem(std::sqrt, in, out); }
   
-  //----------------------------------------------------------------
-  // mul
-  // 
-  // element-by-element multiplication, c = a * b:
-  // 
-  template <class a_t, class b_t>
-  inline void
-  mul(const a_t & a, const b_t & b, fft_data_t & c)
-  { elem_by_elem(_mul, a, b, c); }
+  // //----------------------------------------------------------------
+  // // sqrt
+  // // 
+  // inline fft_data_t
+  // sqrt(const fft_data_t & in)
+  // {
+  //   fft_data_t out;
+  //   sqrt(in, out);
+  //   return out;
+  // }
   
-  //----------------------------------------------------------------
-  // mul
-  // 
-  template <class a_t, class b_t>
-  inline fft_data_t
-  mul(const a_t & a, const b_t & b)
-  {
-    fft_data_t c;
-    mul<a_t, b_t>(a, b, c);
-    return c;
-  }
+  
+  // //----------------------------------------------------------------
+  // // _mul
+  // //
+  // template <class a_t, class b_t>
+  // inline fft_complex_t
+  // _mul(const a_t & a, const b_t & b)
+  // { return a * b; }
+  
+  // //----------------------------------------------------------------
+  // // mul
+  // // 
+  // // element-by-element multiplication, c = a * b:
+  // // 
+  // template <class a_t, class b_t>
+  // inline void
+  // mul(const a_t & a, const b_t & b, fft_data_t & c)
+  // { elem_by_elem(_mul, a, b, c); }
+  
+  // //----------------------------------------------------------------
+  // // mul
+  // // 
+  // template <class a_t, class b_t>
+  // inline fft_data_t
+  // mul(const a_t & a, const b_t & b)
+  // {
+  //   fft_data_t c;
+  //   mul<a_t, b_t>(a, b, c);
+  //   return c;
+  // }
   
   
   //----------------------------------------------------------------
@@ -318,27 +330,27 @@ namespace itk_fft
   _div(const a_t & a, const b_t & b)
   { return a / b; }
   
-  //----------------------------------------------------------------
-  // div
-  // 
-  // element-by-element division, c = a / b:
-  // 
-  template <class a_t, class b_t>
-  inline void
-  div(const a_t & a, const b_t & b, fft_data_t & c)
-  { elem_by_elem(_div, a, b, c); }
+  // //----------------------------------------------------------------
+  // // div
+  // // 
+  // // element-by-element division, c = a / b:
+  // // 
+  // template <class a_t, class b_t>
+  // inline void
+  // div(const a_t & a, const b_t & b, fft_data_t & c)
+  // { elem_by_elem(_div, a, b, c); }
   
-  //----------------------------------------------------------------
-  // div
-  // 
-  template <class a_t, class b_t>
-  inline fft_data_t
-  div(const a_t & a, const b_t & b)
-  {
-    fft_data_t c;
-    div<a_t, b_t>(a, b, c);
-    return c;
-  }
+  // //----------------------------------------------------------------
+  // // div
+  // // 
+  // template <class a_t, class b_t>
+  // inline fft_data_t
+  // div(const a_t & a, const b_t & b)
+  // {
+  //   fft_data_t c;
+  //   div<a_t, b_t>(a, b, c);
+  //   return c;
+  // }
   
   
   //----------------------------------------------------------------
@@ -349,58 +361,58 @@ namespace itk_fft
   _add(const a_t & a, const b_t & b)
   { return a + b; }
   
-  //----------------------------------------------------------------
-  // add
-  // 
-  // element-by-element addition, c = a + b:
-  // 
-  template <class a_t, class b_t>
-  inline void
-  add(const a_t & a, const b_t & b, fft_data_t & c)
-  { elem_by_elem(_add, a, b, c); }
+  // //----------------------------------------------------------------
+  // // add
+  // // 
+  // // element-by-element addition, c = a + b:
+  // // 
+  // template <class a_t, class b_t>
+  // inline void
+  // add(const a_t & a, const b_t & b, fft_data_t & c)
+  // { elem_by_elem(_add, a, b, c); }
   
-  //----------------------------------------------------------------
-  // add
-  // 
-  template <class a_t, class b_t>
-  inline fft_data_t
-  add(const a_t & a, const b_t & b)
-  {
-    fft_data_t c;
-    add<a_t, b_t>(a, b, c);
-    return c;
-  }
+  // //----------------------------------------------------------------
+  // // add
+  // // 
+  // template <class a_t, class b_t>
+  // inline fft_data_t
+  // add(const a_t & a, const b_t & b)
+  // {
+  //   fft_data_t c;
+  //   add<a_t, b_t>(a, b, c);
+  //   return c;
+  // }
   
   
-  //----------------------------------------------------------------
-  // _sub
-  // 
-  template <class a_t, class b_t>
-  inline fft_complex_t
-  _sub(const a_t & a, const b_t & b)
-  { return a - b; }
+  // //----------------------------------------------------------------
+  // // _sub
+  // // 
+  // template <class a_t, class b_t>
+  // inline fft_complex_t
+  // _sub(const a_t & a, const b_t & b)
+  // { return a - b; }
   
-  //----------------------------------------------------------------
-  // sub
-  // 
-  // element-by-element subtraction, c = a - b:
-  // 
-  template <class a_t, class b_t>
-  inline void
-  sub(const a_t & a, const b_t & b, fft_data_t & c)
-  { elem_by_elem(_sub, a, b, c); }
+  // //----------------------------------------------------------------
+  // // sub
+  // // 
+  // // element-by-element subtraction, c = a - b:
+  // // 
+  // template <class a_t, class b_t>
+  // inline void
+  // sub(const a_t & a, const b_t & b, fft_data_t & c)
+  // { elem_by_elem(_sub, a, b, c); }
   
-  //----------------------------------------------------------------
-  // sub
-  // 
-  template <class a_t, class b_t>
-  inline fft_data_t
-  sub(const a_t & a, const b_t & b)
-  {
-    fft_data_t c;
-    sub<a_t, b_t>(a, b, c);
-    return c;
-  }
+  // //----------------------------------------------------------------
+  // // sub
+  // // 
+  // template <class a_t, class b_t>
+  // inline fft_data_t
+  // sub(const a_t & a, const b_t & b)
+  // {
+  //   fft_data_t c;
+  //   sub<a_t, b_t>(a, b, c);
+  //   return c;
+  // }
 }
 
 

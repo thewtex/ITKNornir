@@ -20,6 +20,7 @@ set(Nornir_SRCS
   IRAABBox.cxx
   IRTerminator.cxx
   IRStdMutex.cxx
+  IRFFT.cxx
 )
 
 itk_module_add_library(Nornir ${Nornir_SRCS})
