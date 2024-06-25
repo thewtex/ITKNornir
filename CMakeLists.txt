@@ -18,4 +18,6 @@ endif()
 
 # These are not expected to pass.
 # Mark the tests NornirKWStyleTest and NornirInDoxygenGroup as expected to fail
-set_tests_properties(NornirKWStyleTest NornirInDoxygenGroup PROPERTIES WILL_FAIL TRUE)
+if(BUILD_TESTING)
+  set_tests_properties(NornirKWStyleTest NornirInDoxygenGroup PROPERTIES WILL_FAIL TRUE)
+endif()
