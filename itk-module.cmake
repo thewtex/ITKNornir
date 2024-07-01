@@ -13,15 +13,20 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 # define the dependencies of the include module and the tests
 itk_module(Nornir
   DEPENDS
-    ITKCommon
-    ITKStatistics
+  ITKCommon
+  ITKStatistics
+  ITKIOImageBase
+  ITKTransformFactory
   COMPILE_DEPENDS
-    ITKImageSources
+  ITKImageSources
+  ITKImageIntensity
+  ITKThresholding
+  ITKSmoothing
+  ITKRegistrationCommon
   TEST_DEPENDS
-    ITKTestKernel
-    ITKMetaIO
+  ITKTestKernel
   DESCRIPTION
-    "${DOCUMENTATION}"
+  "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
   ENABLE_SHARED
 )

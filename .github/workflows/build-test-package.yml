@@ -1,12 +1,20 @@
 name: Build, test, package
 
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 on: [push,pull_request]
 
 jobs:
   cxx-build-workflow:
-    uses: thewtex/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-cxx.yml@1f6e25cd9a591707611af5bbb94b7d2fbfa42994
+    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-cxx.yml@v5.4.0
 
   python-build-workflow:
-    uses: thewtex/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-package-python.yml@1f6e25cd9a591707611af5bbb94b7d2fbfa42994
+    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-package-python.yml@v5.4.0
     secrets:
       pypi_password: ${{ secrets.pypi_password }}

@@ -1,3 +1,4 @@
+CMakePresets.json
 emscripten-build/
 wasi-build/
 node_modules/
